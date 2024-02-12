@@ -85,3 +85,23 @@
 %%% Various table goodies
 \newcommand{\pulrad}[1]{\raisebox{1.5ex}[0pt]{#1}}
 \newcommand{\mc}[1]{\multicolumn{1}{c}{#1}}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+% TODO commands
+\newcommand{\TODO}[1]{%
+    \textcolor{orange}{\textbf{TODO #1}}% Bold and orange text
+    \marginpar{\textcolor{orange}{\PencilLeft}}% Symbol on the side of the page
+    \PackageWarning{TODO}{#1}% Warning in LaTeX log
+}
+
+\newcommand{\todo}[1]{%
+    \textcolor{orange}{\textbf{#1}}% Bold and orange text
+    \marginpar{\textcolor{orange}{\PencilLeft}}% Symbol on the side of the page
+    \PackageWarning{TODO}{#1}% Warning in LaTeX log
+}
+
+\newcommand{\wording}[1]{%
+    \textcolor{brown}{#1}% orange text
+    \marginpar{\textcolor{brown}{\PencilLeft}}% Symbol on the side of the page
+}
