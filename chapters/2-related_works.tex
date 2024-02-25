@@ -1,0 +1,99 @@
+\chapter{Related works}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section*{Briefly on scheduling}
+
+\begin{itemize}
+    \item Scheduling is a broadly studied problem in literature. This is due to the practicality
+        of the problem and high utilization of achieved results.
+    \begin{itemize}
+        \item Applying scheduling theory on a specific practical problem, case studies.
+        \item Developing the scheduling theory.
+        \item Applying results from other fields to problems in scheduling, e.g. mathematical programming
+            \citep{KNOP2018}
+    \end{itemize}        
+
+    \item On scheduling generally (Job shop, \dots).
+
+\end{itemize}
+    
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section*{Bottlenecks in scheduling}
+
+\begin{itemize}
+    \item Bottlenecks play an important role in scheduling. This statement is well captured
+        in the following definition.
+    \begin{defn*}[Bottleneck \citep{BETTERTON2012}]
+        The \emph{bottleneck} is the resource that affects the performance of a system in the strongest
+        manner, that is, the resource that, for a given differential increment of change, has
+        the largest influence on system performance.
+    \end{defn*}
+        This definition, however, leaves a lot of room for interpretation.
+        \begin{itemize}
+            \item How to measure affect on performance?
+            \item What is a differential increment of change?
+            \item Based on that, how to measure influence on system performance?
+        \end{itemize}
+    
+    \item Two approaches
+    \begin{itemize}
+        \item Bottlenecks in creating a schedule - identified as a heuristic to guide the search
+            for (near) optimal solutions.
+        \begin{itemize}
+            \item \citet{ADAMS1988}, shifting bottlenecks
+        \end{itemize}
+
+        \item Bottlenecks in a presented schedule - identified to gain information about the system's
+            limitations with possible aim to improve those limitations.
+        \begin{itemize}
+            \item \citet{LAWRENCE1994} studied \emph{shifting bottlenecks}\footnote{The same term
+                \emph{shifting bottleneck} is used for a slightly different concept, as opposed to the work
+                of \citet{ADAMS1988}} in a completed schedule. The study focused on how does
+                the identification of the bottleneck machine changes through time.
+
+                \todo{This might be the literature closest to our problem. Instead of identifying a single
+                    machine as a bottleneck for the whole system during the entire scheduling horizon,
+                    they proposed a mechanism to observe bottlenecks in time.}
+        \end{itemize}
+        
+    \end{itemize}
+
+    \item Shifting bottlenecks - optimal schedule building based on a shifting bottleneck
+    \item 
+\end{itemize}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section*{Bottleneck identification}
+
+Identifying 
+
+\begin{itemize}
+    \item Simple evaluation indicators
+    \item Combinatorial properties
+    \item Properties of an alternative optimization model
+\end{itemize}
+
+\begin{itemize}
+    \item \emph{Simple evaluation indicators} are studied the most.
+
+    \item Some indicators:
+    \begin{itemize}
+        \item Machine workload:
+            $$
+            \operatorname{MW}_k = \sum_{\substack{j\\ \text{$j$ consumes $k$}}}^n p_j = \sum_j^n \cdot \left[ \text{$j$ consumes $k$} \right]= \sum_j^n p_j \cdot 1^{r_{jk}}
+            $$ 
+            This sums processing times of jobs which consume the resource $k$.
+
+        \item Machine Utilization Rate:
+            $$
+            \operatorname{MUR}_k = \frac{\operatorname{MW}_k}{\max_{j \;:\; \text{$j$ consumes $k$}} C_j - \min_{j \;:\; \text{$j$ consumes $k$}} (C_j - p_j)}
+            $$
+
+        \item Average Uninterrupted Active Duration
+            $$
+            \operatorname{AUAD}_k = \frac{\sum_{a \in A_k} \abs{a_k}}{\abs{A_k}}
+            $$
+            where $A_k$ is the \todo{set of uninterrupted periods}
+    \end{itemize}
+\end{itemize}
+

@@ -40,6 +40,7 @@
 
 \theoremstyle{plain}
 \newtheorem{defn}{Definition}
+\newtheorem*{defn*}{Definition}
 
 \theoremstyle{remark}
 \newtheorem*{cor}{Corollary}
@@ -101,7 +102,20 @@
     \PackageWarning{TODO}{#1}% Warning in LaTeX log
 }
 
+\newcommand{\toask}[1]{%
+    \textcolor{blue}{\textbf{#1}}% Bold and orange text
+    \marginpar{\textcolor{blue}{\large{\textbf{?}}}}% Symbol on the side of the page
+    \PackageWarning{TODO}{#1}% Warning in LaTeX log
+}
+
 \newcommand{\wording}[1]{%
     \textcolor{brown}{#1}% orange text
     \marginpar{\textcolor{brown}{\PencilLeft}}% Symbol on the side of the page
+}
+
+% This macro defines a section, which is not numbered, but is included
+% in the table of contents.
+\def\secwithtoc#1{
+\section*{#1}
+\addcontentsline{toc}{section}{#1}
 }

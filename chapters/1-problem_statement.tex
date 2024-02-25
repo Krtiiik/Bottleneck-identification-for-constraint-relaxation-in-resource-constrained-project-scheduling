@@ -1,0 +1,71 @@
+\chapter{Problem statement}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section{Scheduling}
+
+\begin{itemize}
+    \item General definition of \ac{rcpsp}
+
+    \item Describe the $PSm \;|\; prec \;|\; \sum_{j} w_j T_j$ problem.
+        Schema defined by \citet{BRUCKER1999}.
+    \begin{itemize}
+        \item \emph{Jobs} $1, \dots, n$.
+        \begin{itemize}
+            \item Each job $j$ has an execution \emph{duration} $p_j$ - the amount of time needed to process
+                the job $j$. Execution of jobs is \emph{preemptive} - the execution of a job cannot be interrupted
+                after its start.
+            \item Execution order of jobs is constrained with \emph{precedence constraints}.
+                A precedence constraint between jobs $i$ and $j$, denoted as $i \rightarrow j$,
+                describes that processing of job $j$ can start only after the processing of job $i$
+                was completed.
+        \end{itemize}
+        
+        \item The project also consists of \emph{resources} - machines with constant renewable \emph{capacities}.
+        \begin{itemize}
+            \item Capacity of a resource $k$ is denoted as $R_k$. Capacity describes that each time period,
+                resource $k$ has $R_k$ units of its capacity available for use. Capacities are renewable,
+                meaning that each time period the same amount of capacity is available, regardless of prior
+                capacity consumptions.
+            \item Capacities of resources are consumed by jobs during their execution. For a job $j$,
+                the per-period consumption of the resource $k$ is denoted as $r_{jk}$. This describes how much
+                of the resource's capacity the job is consuming each period during the job's execution.
+            \item \todo{Shift modes - zero capacities}
+        \end{itemize}
+
+        \item \TODO{Components}
+    \end{itemize}
+
+    \item Interpretation
+    \begin{itemize}
+        \item \todo{No preemption = no pauses}
+        \item Job precedences represent the production process of manufactured goods.
+            \todo{process example}
+    \end{itemize}
+\end{itemize}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section{Constraint programming model}
+
+\begin{itemize}
+    \item Formulation of the \ac{rcpsp} via constraint programming
+    \item Structured definition which enables later redefinition of relaxed constraints
+\end{itemize}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section{Alternative schedule}
+
+\begin{itemize}
+    \item Suppose we have obtained a solution to the aforementioned problem
+    \item Select job(s) for which to improve tardiness
+    \item Formulate the alternative model for which to find the alternative solution
+    \item Find an alternative solution achieving improvement of the selected tardiness while
+        minimizing the solution difference
+\end{itemize}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section{Bottlenecks}
+
+\begin{itemize}
+    \item General bottleneck definition
+    \item Time-dependent bottleneck definition - based on the alternative solution?
+\end{itemize}
