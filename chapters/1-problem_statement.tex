@@ -6,18 +6,32 @@
 \begin{itemize}
     \item General definition of \ac{rcpsp}
 
-    \item Describe the $PSm \;|\; prec \;|\; \sum_{j} w_j T_j$ problem.
+    \item Describe the $PSm \;|\; intree \;|\; \sum_{j} w_j T_j$ problem.
         Schema defined by \citet{BRUCKER1999}.
+        \toask{Keep jobs as atomic scheduling units. Define orders a set of tuples (job, due\_date, weight) }
     \begin{itemize}
-        \item \emph{Jobs} $1, \dots, n$.
+        \item \emph{Project} consisting of \emph{jobs} $1, \dots, n$.
         \begin{itemize}
+            % Jobs
             \item Each job $j$ has an execution \emph{duration} $p_j$ - the amount of time needed to process
-                the job $j$. Execution of jobs is \emph{preemptive} - the execution of a job cannot be interrupted
-                after its start.
+                the job $j$. \emph{Preemption} of jobs is not allowed - the execution of an job
+                cannot be interrupted after its start.
+
+            % Precedences
             \item Execution order of jobs is constrained with \emph{precedence constraints}.
-                A precedence constraint between jobs $i$ and $j$, denoted as $i \rightarrow j$,
+                A precedence constraint between jobs $i$ and $j$, denoted as $i \rightarrow j$ or $(i, j)$,
                 describes that processing of job $j$ can start only after the processing of job $i$
                 was completed.
+
+                We denote the set of all jobs as $V$ and the set of all precedences as $E$.
+                We then define the \emph{precedence graph} $G = (V, E)$.
+                
+                The precedence graph is an \emph{inforest}. An inforest is a directed acyclic graph
+                where each vertex has at most one successor. A connected subgraph of an inforest
+                is an \emph{intree}.
+
+            % Orders
+            \item 
         \end{itemize}
         
         \item The project also consists of \emph{resources} - machines with constant renewable \emph{capacities}.
@@ -26,9 +40,11 @@
                 resource $k$ has $R_k$ units of its capacity available for use. Capacities are renewable,
                 meaning that each time period the same amount of capacity is available, regardless of prior
                 capacity consumptions.
+
             \item Capacities of resources are consumed by jobs during their execution. For a job $j$,
                 the per-period consumption of the resource $k$ is denoted as $r_{jk}$. This describes how much
                 of the resource's capacity the job is consuming each period during the job's execution.
+
             \item \todo{Shift modes - zero capacities}
             \item \TODO{Resource consumption Step function? It would make for an elegant definition
             of some evaluation indicators.}
