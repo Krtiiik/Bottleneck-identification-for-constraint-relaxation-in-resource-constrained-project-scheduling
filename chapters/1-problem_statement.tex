@@ -46,18 +46,46 @@
                 of the resource's capacity the job is consuming each period during the job's execution.
 
             \item \todo{Shift modes - zero capacities}
-            \item \TODO{Resource consumption Step function? It would make for an elegant definition
+            \item \todo{Resource consumption Step function? It would make for an elegant definition
             of some evaluation indicators.}
         \end{itemize}
 
-        \item \TODO{Components}
+        \item \todo{Components}
     \end{itemize}
+
+    \item \todo{This might need to be an appendix entry} Notation table, based on the notation of \cite{BRUCKER1999}.
+    \begin{table}
+        \centering
+        \begin{tabular}{ll}
+            Symbol & Definition \\
+            \hline
+            $n$                             & Number of jobs \\
+            $V = \{ 1, \dots, n \}$         & Set of jobs \\
+            $i \rightarrow j$ or $(i,j)$    & Precedence between jobs $i$ and $j$ \\
+            $E$                             & Set of precedences \\
+            $G = (V, E)$                    & Precedence graph \\
+            \hline
+            $p_j$       & Processing time of job $j$ \\
+            $R_k$       & Capacity of resource $k$ \\
+            $r_{jk}$    & Per-period consumption of a resource $k$ by a job $j$ \\
+            \hline
+            $S_j$                   & Start time of job $j$ \\
+            $S = (S_1, \dots, S_n)$ & Schedule \\
+            $C_j = S_j + p_j$       & Completion time of job $j$ \\
+            $C = (C_1, \dots, C_n)$ & All completion times of jobs \\
+        \end{tabular}
+        
+        \caption{Scheduling notation}
+        \label{tab:SchedulingNotation}
+    \end{table}
 
     \item Interpretation
     \begin{itemize}
         \item \todo{No preemption = no pauses}
         \item Job precedences represent the production process of manufactured goods.
             \todo{process example}
+
+    
     \end{itemize}
 \end{itemize}
 

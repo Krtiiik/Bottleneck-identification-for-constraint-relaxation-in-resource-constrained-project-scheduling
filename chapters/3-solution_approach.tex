@@ -12,21 +12,35 @@
         through time, a binary \enquote{processing-idle} differentiation between machine states does not
         provide a sufficient machine-load indication.
 
-        
+        Figure \ref{fig:MachineLoad} illustrates the difference between the variability of the load
+        of a Job Shop machine (subfigure \ref{fig:MachineLoad:JS}) and that of a \ac{rcpsp}
+        (subfigure \ref{fig:MachineLoad:RCPSP}).
+        \todo{Edit RCPSP image: change the second pistachio job to better convey the message of variable load}
 
-    \begin{figure}[ht]
+    \begin{figure}[t]
       \centering
-      \subfloat[Job Shop]{\includegraphics[width=0.45\textwidth]{img/Capacities-JobShop.pdf}\label{fig:f1}}
-      \hfill
-      \subfloat[RCPSP]{\includegraphics[width=0.45\textwidth]{img/Capacities-RCPSP.pdf}\label{fig:f2}}
+
+      \subfloat[Job Shop]{\includegraphics[width=0.7\textwidth]{img/Capacities-JobShop.pdf}\label{fig:MachineLoad:JS}}
+      \\
+      \subfloat[RCPSP]{\includegraphics[width=0.7\textwidth]{img/Capacities-RCPSP.pdf}\label{fig:MachineLoad:RCPSP}}
+
       \caption{Caption.}
+      \label{fig:MachineLoad}
     \end{figure}
+
+    We adapt \ac{mw}, \ac{mur}, and \ac{auad} indicators (defined in \todo{ref Related works}) respectively as follows:
     \begin{itemize}
-        \item Machine Workload
+        \item \ac{mrw}
+        $$
+        \indMRW{k} = \sum_{\substack{j \;:\; \text{$j$ consumes $k$}}} p_j \; r_{jk}
+        $$
 
-        \item Machine Utilization Rate
+        \item \ac{mrur}
+        $$
+        \indMRUR{k} = 
+        $$
 
-        \item Average Uninterrupted Active Duration
+        \item \ac{auac}
     \end{itemize}
 
     \item Try to find alternative schedule based on the found bottlenecks

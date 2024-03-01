@@ -78,20 +78,20 @@ Identifying
 
     \item Some indicators:
     \begin{itemize}
-        \item Machine workload:
+        \item \ac{mw} \citep{}:
             $$
-            \operatorname{MW}_k = \sum_{\substack{j\\ \text{$j$ consumes $k$}}}^n p_j = \sum_j^n \cdot \left[ \text{$j$ consumes $k$} \right]= \sum_j^n p_j \cdot 1^{r_{jk}}
+            \indMW{k} = \sum_{j \;:\; \text{$j$ consumes $k$}} p_j
             $$ 
             This sums processing times of jobs which consume the resource $k$.
 
-        \item Machine Utilization Rate:
+        \item \ac{mur}:
             $$
-            \operatorname{MUR}_k = \frac{\operatorname{MW}_k}{\max_{j \;:\; \text{$j$ consumes $k$}} C_j - \min_{j \;:\; \text{$j$ consumes $k$}} (C_j - p_j)}
+            \indMUR{k} = \frac{\indMW{k}}{\max_{j \;:\; \text{$j$ consumes $k$}} C_j - \min_{j \;:\; \text{$j$ consumes $k$}} S_j}
             $$
 
-        \item Average Uninterrupted Active Duration
+        \item \ac{auad} \citep{ROSER2001}:
             $$
-            \operatorname{AUAD}_k = \frac{\sum_{a \in A_k} \abs{a}}{\abs{A_k}}
+            \indAUAD{k} = \frac{\sum_{a \in A_k} \abs{a}}{\abs{A_k}}
             $$
             where $A_k$ is the \todo{set of uninterrupted periods}
     \end{itemize}

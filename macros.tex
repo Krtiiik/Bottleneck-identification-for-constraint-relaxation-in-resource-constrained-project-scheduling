@@ -87,35 +87,41 @@
 \newcommand{\pulrad}[1]{\raisebox{1.5ex}[0pt]{#1}}
 \newcommand{\mc}[1]{\multicolumn{1}{c}{#1}}
 
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%%% My macros ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-% TODO commands
-\newcommand{\TODO}[1]{%
-    \textcolor{orange}{\textbf{TODO #1}}% Bold and orange text
-    \marginpar{\textcolor{orange}{\PencilLeft}}% Symbol on the side of the page
-    \PackageWarning{TODO}{#1}% Warning in LaTeX log
-}
-
+%%% Work-In-Progress designators --------------------------------------------------------
 \newcommand{\todo}[1]{%
     \textcolor{orange}{\textbf{#1}}% Bold and orange text
     \marginpar{\textcolor{orange}{\PencilLeft}}% Symbol on the side of the page
     \PackageWarning{TODO}{#1}% Warning in LaTeX log
 }
-
 \newcommand{\toask}[1]{%
     \textcolor{blue}{\textbf{#1}}% Bold and orange text
     \marginpar{\textcolor{blue}{\large{\textbf{?}}}}% Symbol on the side of the page
     \PackageWarning{TODO}{#1}% Warning in LaTeX log
 }
-
 \newcommand{\wording}[1]{%
     \textcolor{brown}{#1}% orange text
     \marginpar{\textcolor{brown}{\PencilLeft}}% Symbol on the side of the page
 }
 
-% This macro defines a section, which is not numbered, but is included
-% in the table of contents.
+%%% Typography or something -------------------------------------------------------------
+% This macro defines a section, which is not numbered, but is included in the table of contents.
 \def\secwithtoc#1{
 \section*{#1}
 \addcontentsline{toc}{section}{#1}
 }
+
+%%% Math --------------------------------------------------------------------------------
+\newcommand{\precedence}[2]{#1 \rightarrow #2}
+
+
+%%% Indicators -------------------------------------------------------
+\newcommand{\indicator}[2]{\operatorname{#1}_{#2}}
+
+\newcommand{\indMW}[1]{\indicator{MW}{#1}}
+\newcommand{\indMUR}[1]{\indicator{MUR}{#1}}
+\newcommand{\indAUAD}[1]{\indicator{AUAD}{#1}}
+\newcommand{\indMRW}[1]{\indicator{MRW}{#1}}
+\newcommand{\indMRUR}[1]{\indicator{MRUR}{#1}}
+\newcommand{\indAUAC}[1]{\indicator{AUAC}{#1}}
