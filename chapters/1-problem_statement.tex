@@ -8,49 +8,78 @@
 
     \item Describe the $PSm \;|\; intree \;|\; \sum_{j} w_j T_j$ problem.
         Schema defined by \citet{BRUCKER1999}.
-        \toask{Keep jobs as atomic scheduling units. Define orders a set of tuples (job, due\_date, weight) }
     \begin{itemize}
-        \item \emph{Project} consisting of \emph{jobs} $1, \dots, n$.
+        \item \emph{Project} consisting of \emph{jobs} $1, \dots, n \in J$.
         \begin{itemize}
             % Jobs
-            \item Each job $j$ has an execution \emph{duration} $p_j$ - the amount of time needed to process
-                the job $j$. \emph{Preemption} of jobs is not allowed - the execution of an job
-                cannot be interrupted after its start.
+            \item Each job $j$ has an execution \emph{duration} $\duration{j}$ - the amount of time needed to process the job $j$.
+                \emph{Preemption} of jobs is not allowed - the execution of an job cannot be interrupted after its start.
 
             % Precedences
             \item Execution order of jobs is constrained with \emph{precedence constraints}.
-                A precedence constraint between jobs $i$ and $j$, denoted as $i \rightarrow j$ or $(i, j)$,
-                describes that processing of job $j$ can start only after the processing of job $i$
-                was completed.
+                A precedence constraint between jobs $i$ and $j$, denoted as $\precedence{i}{j}$ or $(i, j)$,
+                describes that processing of job $j$ can start only after the processing of job $i$ was completed.
 
-                We denote the set of all jobs as $V$ and the set of all precedences as $E$.
-                We then define the \emph{precedence graph} $G = (V, E)$.
-                
+                We denote the set of all jobs as $\Jobs$ and the set of all precedences as $\Precedences$.
+                We then define the \emph{precedence graph} $G = (\Jobs, \Precedences)$.
+
                 The precedence graph is an \emph{inforest}. An inforest is a directed acyclic graph
                 where each vertex has at most one successor. A connected subgraph of an inforest
                 is an \emph{intree}.
 
-            % Orders
-            \item 
+            % Tardiness
+            \item Each job $j$ has a \emph{deadline} $\deadline{j}$ - a time horizon in which the job
+                should be completed, otherwise it is considered \emph{tardy}. In relation to its deadline,
+                each job $j$ also has a \emph{tardiness weight} $\tardinessweight{j}$. This defines a penalty accumulated
+                for each unit of time the job is tardy for.
+                \todo{squared penalty as the optimization goal}
         \end{itemize}
-        
-        \item The project also consists of \emph{resources} - machines with constant renewable \emph{capacities}.
+
+        \item The jobs are executed on \emph{resources} - machines with time-variant renewable \emph{capacities}.
         \begin{itemize}
-            \item Capacity of a resource $k$ is denoted as $R_k$. Capacity describes that each time period,
-                resource $k$ has $R_k$ units of its capacity available for use. Capacities are renewable,
-                meaning that each time period the same amount of capacity is available, regardless of prior
-                capacity consumptions.
+            \item Capacity of a resource $k$ during a time period $t$ is denoted as $\capacity{k}{t}$ - the amount
+                of resource $k$ available for consumption by jobs during the period $t$.
+                We denote the maximum capacity of a resource $k$ throughout all time periods as $\maxcapacity{k}$.
 
             \item Capacities of resources are consumed by jobs during their execution. For a job $j$,
-                the per-period consumption of the resource $k$ is denoted as $r_{jk}$. This describes how much
+                the per-period consumption of a resource $k$ is denoted as $\consumption{j}{k}$. This describes how much
                 of the resource's capacity the job is consuming each period during the job's execution.
 
-            \item \todo{Shift modes - zero capacities}
+            \item Capacities are renewable, meaning that each time period the specified amount of capacity is available,
+            regardless of prior capacity consumptions.
+
+            \item \todo{Shift modes - zero capacities} Although the definition of a resource's capacity allows it
+                to be an arbitrary step-function, we assume that \wording{the only values it takes are} $0$ and $\maxcapacity{k}$.
+                In addition, we assume that the function is periodical.
+
             \item \todo{Resource consumption Step function? It would make for an elegant definition
             of some evaluation indicators.}
         \end{itemize}
 
-        \item \todo{Components}
+        \item The definitions presented to this point are well-established in scheduling
+            literature. We extend the standard project definition with the notion of \emph{orders}.
+            The set of orders \todo{nexists} $\Orders = \{ j \in \Jobs \mid \not\exists i : \precedence{j}{i} \}$
+            is the set of roots of the precedence intrees, i.e. the set of all jobs for which
+            no successor exists. If a job is contained in the set of orders $\Orders$, we call it an \emph{order}.
+
+            We make a simple observation; due to the intree-structure, each (weakly) connected component
+            in the precedence graph contains exactly one order. \todo{each job has a unique order - component}
+
+            Having introduced orders, we can now specify the ranges of job deadlines and tardiness weights
+            \wording{related to whether the job belongs to the orders set} $\Orders$:
+
+            $$
+            \deadline{j} \begin{cases}
+                \in \N    &\dots\;   j     \in \Orders \\
+                +\infty   &\dots\;   j \not\in \Orders
+            \end{cases}
+            \qquad
+            \tardinessweight{j} \begin{cases}
+                \geq 0   &\dots\;   j     \in \Orders \\
+                   = 0   &\dots\;   j \not\in \Orders
+            \end{cases}
+            $$
+
     \end{itemize}
 
     \item \todo{This might need to be an appendix entry} Notation table, based on the notation of \cite{BRUCKER1999}.
@@ -60,21 +89,28 @@
             Symbol & Definition \\
             \hline
             $n$                             & Number of jobs \\
-            $V = \{ 1, \dots, n \}$         & Set of jobs \\
-            $i \rightarrow j$ or $(i,j)$    & Precedence between jobs $i$ and $j$ \\
-            $E$                             & Set of precedences \\
-            $G = (V, E)$                    & Precedence graph \\
+            $\Jobs = \{ 1, \dots, n \}$     & Set of jobs \\
+            $\precedence{i}{j}$ or $(i,j)$  & Precedence between jobs $i$ and $j$ \\
+            $\Precedences$                  & Set of precedences \\
+            $G = (\Jobs, \Precedences)$     & Precedence graph \\
+            $\horizon$                      & TIme horizon \\
+            $1, \dots, \horizon$            & Time periods \\
             \hline
-            $p_j$       & Processing time of job $j$ \\
-            $R_k$       & Capacity of resource $k$ \\
-            $r_{jk}$    & Per-period consumption of a resource $k$ by a job $j$ \\
+            $p_j$                   & Processing time of job $j$ \\
+            $\deadline{j}$          & Deadline for a job $j$ \\
+            $\tardinessweight{j}$   & Tardiness weight for a job $j$ \\
+            $\maxcapacity{k}$       & Maximum capacity of resource $k$ \\
+            $\capacity{k}{t}$       & Capacity of resource $k$ in time period $t$ \\
+            $\consumption{j}{k}$    & Per-period consumption of a resource $k$ by a job $j$ \\
             \hline
-            $S_j$                   & Start time of job $j$ \\
-            $S = (S_1, \dots, S_n)$ & Schedule \\
-            $C_j = S_j + p_j$       & Completion time of job $j$ \\
-            $C = (C_1, \dots, C_n)$ & All completion times of jobs \\
+            $\jobstart{j}$                                      & Start time of job $j$ \\
+            $\Schedule = (\jobstart{1}, \dots, \jobstart{n})$   & Schedule \\
+            $\jobend{j} = \jobstart{j} + \duration{j}$          & Completion time of job $j$ \\
+            $\Completions = (\jobend{1}, \dots, \jobend{n})$    & All completion times of jobs \\
+            \tablenote{2}{supper-scripting a value with a schedule symbol - for example
+            $\jobend{j}^{(\solutionOptimal)}$ - relates that value to the specified schedule.} \\
         \end{tabular}
-        
+
         \caption{Scheduling notation}
         \label{tab:SchedulingNotation}
     \end{table}
@@ -84,28 +120,62 @@
         \item \todo{No preemption = no pauses}
         \item Job precedences represent the production process of manufactured goods.
             \todo{process example}
-
-    
     \end{itemize}
 \end{itemize}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Constraint programming model}
 
-\begin{itemize}
-    \item Formulation of the \ac{rcpsp} via constraint programming
-    \item Structured definition which enables later redefinition of relaxed constraints
-\end{itemize}
+Formulation of the \ac{rcpsp} via constraint programming
+
+\todo{squared tardiness?}
+\todo{Resource constraint, is there a better way, more according to the actual implementation?}
+
+\begin{align}
+    \text{minimize}   && \sum_{j \in \Jobs} \tardinessweight{j} \tardiness{j}                                 &                      &&                                              \label{csp:objective} \\
+    \text{subject to} && \jobend{i}                                                                           & \leq \jobstart{j}    && \forall \precedence{i}{j} \in \Precedences   \label{csp:precedences} \\
+                      && \sum_{\substack{j \in \Jobs \\ \jobstart{j} \leq t < \jobend{j}}} \consumption{j}{k} & \leq \capacity{k}{t} && \forall t \in 1, \dots, \horizon \; \forall k \in \Resources \label{csp:capacities} \\
+    \text{where}      && \multispan3{$ \Schedule = (\jobstart{1}, \dots, \jobstart{n}) \in \N^n $ \hfill}                                                                            \nonumber
+\end{align}
+
+Inequalities \eqref{csp:precedences} formulate the precedence constraints - start and end times of jobs
+are according to all the precedences.
+Inequalities \eqref{csp:capacities} formulate the resource capacity constraints - in every time period
+the combined consumption of jobs scheduled during the period cannot exceed any of the resource's capacities.
+Expression \eqref{csp:objective} is the optimization minimization objective - the weighted tardiness of jobs.
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Alternative schedule}
 
 \begin{itemize}
-    \item Suppose we have obtained a solution to the aforementioned problem
-    \item Select job(s) for which to improve tardiness
-    \item Formulate the alternative model for which to find the alternative solution
-    \item Find an alternative solution achieving improvement of the selected tardiness while
-        minimizing the solution difference
+    \item Suppose we have obtained an optimal solution $\solutionOptimal$ to the aforementioned problem.
+        Our goal is to find a solution $\solutionImproved$ which relative to $\solutionOptimal$ improves
+        the optimization goal for selected orders while not differing from $\solutionOptimal$ much.
+
+    \item Based on the obtained solution $\solutionOptimal$ we select order(s) $\OrdersSelected \subseteq \Orders$
+        for which to improve tardiness.
+        We consider improvement to be any non-zero decrease in the objective function with respect to orders from $\OrdersSelected$,
+        i.e.
+
+        $$
+        \sum_{o \in \OrdersSelected} \tardinessweight{o} \tardinessImproved{o} < \sum_{o \in \OrdersSelected} \tardinessweight{o} \tardiness{o}.
+        $$
+
+        Given a solution $\solutionOptimal$, for selected jobs $J \subseteq \Jobs$ and a solution $\solutionImproved$
+        we compute the difference between solutions $\solutionOptimal$ and $\solutionImproved$ as
+
+        $$
+        \diff{\solutionOptimal}{\solutionImproved} \defeq \sum_{j \in J} \abs{\jobend{j}^{(\solutionOptimal)} - \jobend{j}^{(\solutionImproved)}}.
+        $$
+
+        Then, assuming the original optimization goal was to minimize $\gamma(\solutionOptimal)$, the new optimization goal
+        is
+
+        $$
+        \text{minimize}\; \gamma(\solutionImproved) + \alpha \diff{\solutionOptimal}{\solutionImproved}
+        $$
+
+        for a specified constant $\alpha \geq 0$.
 \end{itemize}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -113,5 +183,11 @@
 
 \begin{itemize}
     \item General bottleneck definition
-    \item Time-dependent bottleneck definition - based on the alternative solution?
+        \begin{defn}[Bottleneck \citep{BETTERTON2012}]\label{def:bottleneck}
+            The \emph{bottleneck} is the resource that affects the performance of a system in the strongest
+            manner, that is, the resource that, for a given differential increment of change, has
+            the largest influence on system performance.
+        \end{defn}
+
+    \item \todo{Time-dependent bottleneck definition - based on the alternative solution?}
 \end{itemize}

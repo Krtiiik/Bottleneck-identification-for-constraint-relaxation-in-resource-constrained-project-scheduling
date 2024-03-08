@@ -37,10 +37,17 @@
 
         \item \ac{mrur}
         $$
-        \indMRUR{k} = 
+        \indMRUR{k} = \frac{\indMRW{k}}{R_k \; (\max_{j \;:\; \text{$j$ consumes $k$}} C_j - \min_{j \;:\; \text{$j$ consumes $k$}} S_j)}
         $$
 
-        \item \ac{auac}
+        \item \ac{auac} \todo{this might be a bit harder}
+        $$
+        \indAUAC{k} = \begin{cases}
+            \frac{\sum_{a \in A_k} \text{consumption in $a$}}{\abs{A_k}} & \dots \text{consumption} \\
+            \frac{\sum_{a \in A_k} (\text{consumption in $a$}) / (\text{capacity} \cdot \abs{a}))}{\abs{A_k}} & \dots \text{consumption to capacity ratio} \\
+            \frac{\sum_{a \in A_k} (\text{consumption in $a$}) / (\text{capacity}))}{\abs{A_k}} & \dots \text{consumption to capacity ratio times the period length}
+            \end{cases}
+        $$
     \end{itemize}
 
     \item Try to find alternative schedule based on the found bottlenecks

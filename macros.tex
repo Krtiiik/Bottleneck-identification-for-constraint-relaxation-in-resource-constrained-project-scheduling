@@ -112,9 +112,36 @@
 \addcontentsline{toc}{section}{#1}
 }
 
-%%% Math --------------------------------------------------------------------------------
-\newcommand{\precedence}[2]{#1 \rightarrow #2}
+\newcommand{\tablenote}[2]{\multicolumn{#1}{p{0.95\textwidth}}{\footnotesize \emph{Note:} #2}}
 
+%%% Math --------------------------------------------------------------------------------
+\newcommand{\precedence}[2]{#1 \hspace{-0.2em} \rightarrow \hspace{-0.2em} #2}
+\newcommand{\Jobs}{\mathcal{J}}
+\newcommand{\Precedences}{\mathcal{P}}
+\newcommand{\Orders}{\mathcal{O}}
+\newcommand{\Resources}{\mathcal{R}}
+\newcommand{\horizon}{T}
+
+\newcommand{\duration}[1]{p_{#1}}
+\newcommand{\deadline}[1]{\overset{\sim}{d}_{#1}} % TODO overset
+\newcommand{\tardinessweight}[1]{w_{#1}}
+\newcommand{\maxcapacity}[1]{R_{#1}}
+\newcommand{\capacity}[2]{R^{(#2)}_{#1}}
+\newcommand{\consumption}[2]{r_{#1 #2}}
+
+\newcommand{\jobstart}[1]{S_{#1}}
+\newcommand{\Schedule}{S}
+\newcommand{\jobend}[1]{C_{#1}}
+\newcommand{\Completions}{C}
+\newcommand{\tardiness}[1]{T_{#1}}
+
+\newcommand{\solutionOptimal}{S}
+\newcommand{\solutionImproved}{S^*}
+\newcommand{\OrdersSelected}{O^*}
+\newcommand{\tardinessImproved}[1]{\tardiness{#1}^*}
+
+\newcommand{\diff}[2]{\operatorname{diff}\hspace{-0.2em}\left( #1 ,\; #2 \right)}
+\newcommand{\defeq}{\overset{\text{def}}{=}}
 
 %%% Indicators -------------------------------------------------------
 \newcommand{\indicator}[2]{\operatorname{#1}_{#2}}
