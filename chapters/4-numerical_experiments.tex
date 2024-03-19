@@ -5,20 +5,45 @@
 
 \begin{itemize}
     \item PSPLIB instances
-    \begin{itemize}
-        \item Those are Series–parallel graphs.
-            (See the survey of \citep{PROT2017} for comparison of graph types used in scheduling.)
-            We would, however, prefer precedence graphs which correspond better to our problem.
-    \end{itemize}
+        Those are Series–parallel graphs. (See the survey of \citep{PROT2017} for comparison of graph types
+        used in scheduling.) We would, however, prefer precedence graphs which correspond better to our problem.
 
-    \item Enhanding the instances
-    \begin{itemize}
-        \item Splitting precedence graph into disconnected components simulating order trees.
-            Producing intree precedence graphs.
 
-        \item Non-constant capacities based on schedules
-        \item Tardiness of components - weights to last jobs
-    \end{itemize}
+
+        \citet{KOLISCH1997} created a set of benchmark instances for resource-constrained project scheduling%
+        \footnote{Available online at \url{https://www.om-db.wi.tum.de/psplib/}}.
+        This set has since been used to \wording{evaluate many results in literature}. We select some of the instances
+        to use in our experiments.
+
+        The instances are, however, missing some properties required to \wording{properly simulate our experiments},
+        namely: job deadlines, orders (with related tardiness weights) and variable capacities. We introduce
+        those as extensions to the original instances.
+
+        First, we split the single-component precedence graph (a series-parallel graph) into disconnected
+        components, creating an inforest. We do this by ordering the jobs topologically, then selecting one
+        of the last topological generations as the seed jobs%
+            \footnote{The depth of the selected generation influences the number of created components and the
+            overall structure of the created intree forest.}.
+        Then incrementally, starting from the neighboring generations, for each job from each preceding generation
+        a single successor precedence is selected for connecting the job to a single successor. Analogously,
+        for each job from each succeeding generation a single predecessor precedence is selected.
+        After splitting the graph into an inforest, the roots of the intrees are selected as orders $\Orders$.
+
+        Second, we limit the resource availabilities to simulate working shifts. The capacity availability function
+        of resources is a result of periodical availabilities from periodical intervals combined with single-time
+        availabilities from exception intervals. We use periodical availability intervals, subintervals of $[1 .. 24]$,
+        to denote that a resource is available (maximum capacity $\maxcapacity{k}$) each day during the specified time
+        intervals. Exception intervals, subinterals of $[1 .. \horizon]$, are used to denote a one-time resource
+        availability change of a specified capacity. During time periods not covered by any intervals the capacity
+        of the resource is zero.
+
+        \todo{Due dates}
+
+    \item Solving the CP model
+
+    \item Modifying the instances based on the solutions proposed earlier
+
+    \item Methods of evaluation
 \end{itemize}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
