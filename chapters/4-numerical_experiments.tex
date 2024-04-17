@@ -32,7 +32,7 @@
         Second, we limit the resource availabilities to simulate working shifts. The capacity availability function
         of resources is a result of periodical availabilities from periodical intervals combined with single-time
         availabilities from exception intervals. We use periodical availability intervals, subintervals of $[1 .. 24]$,
-        to denote that a resource is available (maximum capacity $\maxcapacity{k}$) each day during the specified time
+        to denote that a resource is available (maximum capacity $\shiftcapacity{k}$) each day during the specified time
         intervals. Exception intervals, subinterals of $[1 .. \horizon]$, are used to denote a one-time resource
         availability change of a specified capacity. During time periods not covered by any intervals the capacity
         of the resource is zero.
@@ -44,6 +44,22 @@
     \item Modifying the instances based on the solutions proposed earlier
 
     \item Methods of evaluation
+    
+        Having the solution $\Schedule$ to the original problem instance $\Instance$
+        and the solution $\Schedule^*$ to the modified problem instance $\Instance^*$,
+        we compute the following:
+        \begin{itemize}
+            \item Tardiness improvement = $\tardiness{o} - \tardiness{o}^*$
+            \item Solution difference = $\sum_{j \in J} \abs{\jobend{j} - \jobend{j}^*}$
+            \item Upon specifying a capacity migration cost $\mathcal{C}_M$ and a capacity addition cost $\mathcal{C}_A$,
+                the instance modification cost =
+                \begin{align*}
+                    \sum_{k \in \Resources} \sum_{t \in \intinterval{0}{\horizon}}
+                    \big( &C_A \cdot [\capacity{k}{t} = 0] \cdot (\capacity{k}{t}^* - \capacity{k}{t} ) \\
+                    &+ C_M \cdot [\capacity{k}{t} > 0 \land \capacity{k}{t}^* > \capacity{k}{t}] \big)
+                \end{align*}
+
+        \end{itemize}
 \end{itemize}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

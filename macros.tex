@@ -65,6 +65,7 @@
 %%% The field of all real and natural numbers
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\N}{\mathbb{N}}
+\newcommand{\Nzero}{\mathbb{N}^0}
 
 %%% Useful operators for statistics and probability
 \DeclareMathOperator{\pr}{\textsf{P}}
@@ -96,12 +97,12 @@
     \PackageWarning{TODO}{#1}% Warning in LaTeX log
 }
 \newcommand{\toask}[1]{%
-    \textcolor{blue}{\textbf{#1}}% Bold and orange text
+    \textcolor{blue}{\textbf{#1}}% Bold and blue text
     \marginpar{\textcolor{blue}{\large{\textbf{?}}}}% Symbol on the side of the page
     \PackageWarning{TODO}{#1}% Warning in LaTeX log
 }
 \newcommand{\wording}[1]{%
-    \textcolor{brown}{#1}% orange text
+    \textcolor{brown}{#1}% brown text
     \marginpar{\textcolor{brown}{\PencilLeft}}% Symbol on the side of the page
 }
 
@@ -112,21 +113,42 @@
 \addcontentsline{toc}{section}{#1}
 }
 
+% Custom referencable "steps" enumerate
+\newlist{steps}{enumerate}{10}
+\setlist[steps]{label*=\arabic*.}    
+\crefname{stepsi}{step}{steps}
+\Crefname{stepsi}{Step}{Steps}
+
+% Tables stuff
 \newcommand{\tablenote}[2]{\multicolumn{#1}{p{0.95\textwidth}}{\footnotesize \emph{Note:} #2}}
+\newcommand{\cellrule}{\leaders\hbox{\rule[0.3em]{.1pt}{0.4pt}}\hfill\mbox{}}
 
 %%% Math --------------------------------------------------------------------------------
+\newcommand{\defeq}{\overset{\text{def}}{=}}
+\newcommand{\intinterval}[2]{[{#1}..{#2}]}
+
+% Notation
+\NewDocumentCommand{\supscriptable}{m m e{^}}{
+    \IfValueTF{#3}{%
+        #1^{#3#2}%
+    }{%
+        #1^{#2}%
+    }
+}
+\newcommand{\Instance}{\mathcal{I}}
 \newcommand{\precedence}[2]{#1 \hspace{-0.2em} \rightarrow \hspace{-0.2em} #2}
 \newcommand{\Jobs}{\mathcal{J}}
 \newcommand{\Precedences}{\mathcal{P}}
 \newcommand{\Orders}{\mathcal{O}}
 \newcommand{\Resources}{\mathcal{R}}
-\newcommand{\horizon}{T}
+\newcommand{\horizon}{\mathcal{T}}
 
 \newcommand{\duration}[1]{p_{#1}}
-\newcommand{\deadline}[1]{\overset{\sim}{d}_{#1}} % TODO overset
+\newcommand{\deadline}[1]{\tilde{d}_{#1}}
 \newcommand{\tardinessweight}[1]{w_{#1}}
-\newcommand{\maxcapacity}[1]{R_{#1}}
-\newcommand{\capacity}[2]{R^{(#2)}_{#1}}
+\newcommand{\capacity}[2]{\supscriptable{R_{#1}}{(#2)}}
+\newcommand{\capacityf}[1]{R_{#1}}
+\newcommand{\shiftcapacity}[1]{\supscriptable{R_{#1}}{(-)}}
 \newcommand{\consumption}[2]{r_{#1 #2}}
 
 \newcommand{\jobstart}[1]{S_{#1}}
@@ -135,15 +157,16 @@
 \newcommand{\Completions}{C}
 \newcommand{\tardiness}[1]{T_{#1}}
 
-\newcommand{\solutionOptimal}{S}
-\newcommand{\solutionImproved}{S^*}
-\newcommand{\OrdersSelected}{O^*}
-\newcommand{\tardinessImproved}[1]{\tardiness{#1}^*}
+\newcommand{\targetOrder}{o}
 
-\newcommand{\diff}[2]{\operatorname{diff}\hspace{-0.2em}\left( #1 ,\; #2 \right)}
-\newcommand{\defeq}{\overset{\text{def}}{=}}
+\newcommand{\migration}[5]{(#1, #2, #3, #4, #5)}
+\newcommand{\Migrations}{\mathcal{M}}
+\newcommand{\addition}[4]{(#1, #2, #3, #4)}
+\newcommand{\Additions}{\mathcal{A}}
 
-%%% Indicators -------------------------------------------------------
+\newcommand{\modelConsumption}[3]{\operatorname{c}_{#1 #2}^{(#3)}}
+
+% Indicators
 \newcommand{\indicator}[2]{\operatorname{#1}_{#2}}
 
 \newcommand{\indMW}[1]{\indicator{MW}{#1}}

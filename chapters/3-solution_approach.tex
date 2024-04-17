@@ -1,4 +1,4 @@
-\chapter{Solution approach}
+\chapter{Solution approach} \label{chap:solution-apporach}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Baseline solution}
@@ -12,10 +12,9 @@
         through time, a binary \enquote{processing-idle} differentiation between machine states does not
         provide a sufficient machine-load indication.
 
-        Figure \ref{fig:MachineLoad} illustrates the difference between the variability of the load
+        \cref{fig:MachineLoad} illustrates the difference between the variability of the load
         of a Job Shop machine (subfigure \ref{fig:MachineLoad:JS}) and that of a \ac{rcpsp}
         (subfigure \ref{fig:MachineLoad:RCPSP}).
-        \todo{Edit RCPSP image: change the second pistachio job to better convey the message of variable load}
 
     \begin{figure}[t]
       \centering
@@ -50,20 +49,32 @@
         $$
     \end{itemize}
 
-    \item Try to find alternative schedule based on the found bottlenecks
-    \begin{itemize}
-        \item Combinatorial heuristics?
-        \item Simplified optimization?
-    \end{itemize}
+    \item Metric-based evaluation algorithm:
+    \begin{steps}
+        \item We select an evaluation metric and a one-dimensional convolution mask.
+        \item The solution is evaluated using the selected metric. \label{enum:metric-evaluation}
+        \item A resource with an extremal metric value is selected as the bottleneck resource.
+        \item Granularized period consumption is computed for the resource.
+        \item The granularized consumption is convolved with the selected convolution mask to compute
+            an improvement potential for each period.
+        \item A predefined maximum number of periods is selected for improvement,
+            selecting with respect to their corresponding improvement potential.
+        \item The capacity of the bottleneck resource is increased by a predefined value
+            during each of the selected improvement periods.
+        \item An alternative solution of the modified instance is found and the capacity changes
+            are reduced to only include the utilized capacity.
+        \item Repeat from \cref{enum:metric-evaluation} for a predefined number of iterations.
+    \end{steps}
 \end{itemize}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Extended solution}
 
+We propose a procedure which detects bottlenecks in the schedule and relaxes those bottlenecks to obtain
+an improved schedule.
+
 \begin{itemize}
-    \item Come up with a new way of detecting time-variant bottlenecks
-        The sum of delays of jobs using this resource - the delays are from the earliest possible completion
-        time computed from the model with no resource constraints.
+    \item 
 
     \item Apply the method to identify bottlenecks
     \item Relax bottlenecks - one by one, combined?
@@ -73,3 +84,43 @@
         \item Scalable solution?
     \end{itemize}
 \end{itemize}
+
+The procedure:
+
+\begin{steps}
+    \item Find intervals to relax. \label{enum:procedureStart}
+    \item Relax proposed intervals - migrate capacities where possible; otherwise add new capacities.
+    \item Find a solution to the modified problem.
+    \item Reduce capacity changes to only include the utilized changes.
+    \item Repeat from \cref{enum:procedureStart} for predefined number of iterations.
+\end{steps}
+
+Find intervals to relax:
+
+\begin{verbatim}
+For $i in j$
+\end{verbatim}
+
+
+\algrenewcommand\algorithmicdo{\textbf{:}}
+\algrenewcommand\algorithmicthen{\textbf{:}}
+\algrenewcommand\algorithmicelse{\textbf{else:}}
+
+\begin{algorithm}
+\begin{algorithmic}
+\Function{FindIntervalsToRelax}{}
+	\State $r \gets$ a random number between $0$ and $1$
+	\State $\varepsilon \gets 0.0000000000000000000000000000000000000042$
+	\If{$r\geq\varepsilon$}
+		\State execute $A$ \Comment{We discard the return value}
+	\Else
+		\State print: \texttt{Not today, sorry.}
+        \EndIf
+
+
+    \State $a$
+\EndFunction
+\end{algorithmic}
+\caption{TODO}
+\label{alg:findIntervalsToRelax}
+\end{algorithm}
