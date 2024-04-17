@@ -27,7 +27,7 @@ where
 Each job $j \in \Jobs$ has an execution \emph{duration} $\duration{j}$,
 describing the amount of time needed to process the job $j$.
 \emph{Preemption} of jobs is not allowed
-- the execution of an job cannot be interrupted after its start.
+--- the execution of an job cannot be interrupted after its start.
 Each job $j$ also has a \emph{deadline} $\deadline{j}$,
 stating a time horizon in which the job should be completed;
 otherwise, it is considered \emph{tardy}.
@@ -46,7 +46,7 @@ is always an inforest.
 An inforest is a directed acyclic graph where each vertex has at most one successor.
 A connected subgraph of an inforest is an \emph{intree}.
 
-Jobs are executed on \emph{resources} $\Resources$ - machines with time-variant renewable \emph{capacities}.
+Jobs are executed on \emph{resources} $\Resources$ --- machines with time-variant renewable \emph{capacities}.
 Capacity of a resource $k$ during a time period $t$ is denoted as $\capacity{k}{t}$.
 During their execution, jobs consume the capacities of resources.
 For a job $j$, the per-period consumption of a resource $k$ is denoted as $\consumption{j}{k}$.
@@ -56,7 +56,7 @@ regardless of prior capacity consumptions.
 The resource capacity functions $\capacity{k}{t}$ are assumed periodical with the same period
 and the only value they take are $0$ and $\shiftcapacity{k} \negmedspace>\! 0$ for each corresponding resource $k$.
 This assumption, however, is only for the initial problem instance
-- resource capacity functions of modified instances, as described in \cref{sec:alternative-schedule},
+--- resource capacity functions of modified instances, as described in \cref{sec:alternative-schedule},
 can be non-periodical and take arbitrary integer values.
 
 The set of orders $\Orders = \{ j \in \Jobs \mid \nexists i : \precedence{j}{i} \}$
@@ -126,11 +126,11 @@ and allows us to use existing solvers for finding optimal solutions.
                                              $} \nonumber
 \end{align}
 
-Inequalities \eqref{csp:precedences} formulate the precedence constraints - start and end times of jobs
+Inequalities \eqref{csp:precedences} formulate the precedence constraints --- start and end times of jobs
 are according to all the precedences.
-Inequalities \eqref{csp:capacities} formulate the resource capacity constraints - in every time period
+Inequalities \eqref{csp:capacities} formulate the resource capacity constraints --- in every time period
 the combined consumption of jobs scheduled during the period cannot exceed any of the resource's capacities.
-Expression \eqref{csp:objective} is the optimization minimization objective - the weighted tardiness of jobs.
+Expression \eqref{csp:objective} is the optimization minimization objective --- the weighted tardiness of jobs.
 
 We assume we have a black-box solver available,
 which is able to find solutions to the problem modeled through constraint-programming in reasonable time.
@@ -142,7 +142,7 @@ and how to relax specific constraints should they be identified as bottlenecks.
 \section{Bottlenecks} \label{sec:bottlenecks}
 
 Our goal will be to find bottlenecks in the problem, specifically in the obtained schedule
-- in the solution to the constraint-programming model defined in \cref{sec:constraint-programming-model}.
+--- in the solution to the constraint-programming model defined in \cref{sec:constraint-programming-model}.
 Firstly, we state a general definition of a execution-level bottleneck:
 
 \begin{defn*}[\acf{ebm} \citep{WANG2016}]\label{def:bottleneck}
@@ -204,6 +204,14 @@ Migrations are executed by decreasing the capacity of a selected source resource
 by a specified amount over a specified time interval
 and increasing the capacity of a selected target resource
 by the specified amount over the same time interval.
+Illustrative example of a capacity addition and a capacity migrations is shown in \cref{fig:CapacityChanges}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\textwidth]{img/Capacities-Changes.pdf}
+    \caption{Diagram of possible capacity changes}
+    \label{fig:CapacityChanges}
+\end{figure}
 
 We denote a capacity addition as $\addition{k}{s}{e}{c}$, where
 $k$ is the resource whose capacity is increased,
@@ -220,22 +228,29 @@ $\Migrations^{\Instance^*}$ and $\Additions^{\Instance^*}$, respectively.
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Alternative schedule} \label{sec:alternative-schedule}
 
-In the rest of this chapter, we define a general procedure for finding relaxations to the presented problem
-and for proposing a modified relaxed problem to which a solution improves the optimization goal for selected orders.
+In the rest of this chapter, we define a general procedure for solving the presented problem,
+identifying bottlenecks and relaxing corresponding constraints by modifying the initial problem,
+solving the modified problem,
+and evaluating whether the modified solution reached a desired improvement.
 More precisely:
 
 \begin{enumerate}
     \item Suppose we obtained an optimal solution $\Schedule$ to the problem instance $\Instance$.
 
-    \item Based on the obtained solution $\Schedule$ we select a target order $\targetOrder \in \Orders$
-        for which to improve tardiness.
+    \item We select a target order $\targetOrder \in \Orders$ for which to improve tardiness.
         We consider improvement to be any non-zero decrease in the objective function with respect to the
         selected order $\targetOrder$ and its tardiness $\tardiness{\targetOrder}$.
 
-    \item We construct a modified problem instance $\Instance^*$ with corresponding modified
-        resource capacity functions $\capacityf{1}, \dots, \capacityf{m}$.
-        Modifying the capacity functions corresponds to relaxing the \eqref{csp:capacities} constraint
-        in the constraint-programming model.
+    \item We identify bottlenecks in the solution $\Schedule$ of the instance $\Instance$.
 
-    \item Finally, we obtain a solution $\Schedule^*$ to the modified problem instance $\Instance^*$.
+    \item Based on the identified bottlenecks, corresponding constraints are relaxed via
+        capacity additions and capacity migrations.
+        Those capacity changes are captured by modified resource capacity functions
+        $\capacityf{1}^*, \ldots, \capacityf{m}^*$.
+        With these modified capacity functions a modified problem instance $\Instance^*$ is constructed.
+
+    \item We obtain a solution $\Schedule^*$ to the modified problem instance $\Instance^*$.
+
+    \item Finally, any desired evaluations can be made on the modified solution $\Schedule^*$,
+        alongside comparisons to the original solution $\Schedule$.
 \end{enumerate}
