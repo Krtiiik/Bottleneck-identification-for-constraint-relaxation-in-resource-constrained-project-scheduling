@@ -6,13 +6,13 @@ Lastly, we present a formal framework for identifying bottlenecks, relaxing rela
 and obtaining improved solutions.
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\section{Scheduling} \label{sec:scheduling}
+\section{Scheduling} \label{sec:problem-statement/scheduling}
 
 We use the $PSm \;|\; intree \;|\; \sum_{j} w_j T_j$ problem\footnote{Schema defined by \citet{BRUCKER1999}.}
 to model the targeted real-world scheduling problem.
 Additionally, we extend the problem by introducing several new definitions to better model the addressed problem.
 Furthermore, we  introduce the notion of problem instances to help us distinguish between the original problem
-and its modifications, as described in \cref{sec:alternative-schedule}.
+and its modifications, as described in \cref{sec:problem-statement/alternative-schedule}.
 
 A \emph{Problem instance} is a 4-tuple $\Instance = (\Jobs, \Precedences, \Resources, \horizon)$,
 where
@@ -56,7 +56,7 @@ regardless of prior capacity consumptions.
 The resource capacity functions $\capacity{k}{t}$ are assumed periodical with the same period
 and the only value they take are $0$ and $\shiftcapacity{k} \negmedspace>\! 0$ for each corresponding resource $k$.
 This assumption, however, is only for the initial problem instance
---- resource capacity functions of modified instances, as described in \cref{sec:alternative-schedule},
+--- resource capacity functions of modified instances, as described in \cref{sec:problem-statement/alternative-schedule},
 can be non-periodical and take arbitrary integer values.
 
 The set of orders $\Orders = \{ j \in \Jobs \mid \nexists i : \precedence{j}{i} \}$
@@ -85,7 +85,7 @@ $$
 $$
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\section{Constraint programming model} \label{sec:constraint-programming-model}
+\section{Constraint programming model} \label{sec:problem-statement/constraint-programming-model}
 
 We formulate the problem using a constraint programming model.
 This provides us with a well-functioning framework
@@ -97,11 +97,11 @@ and allows us to use existing solvers for finding optimal solutions.
                                              \Precedences ,\;%
                                              $} \nonumber \\
                       && \multicolumn{4}{l}{$\duration{1}, \dots, \duration{n} \in \Nzero ,\;%
-                                             \deadline{1}, \dots, \deadline{n} \in \intinterval{0}{\horizon} ,\;%
+                                             \deadline{1}, \dots, \deadline{n} \in \intinterval{1}{\horizon} ,\;%
                                              \tardinessweight{1}, \dots, \tardinessweight{n} \in \Nzero ,\;%
                                              $} \nonumber \\
                       && \multicolumn{4}{l}{$\consumption{1}{1}, \dots, \consumption{n}{m} \in \Nzero ,\;%
-                                             \capacityf{1}, \dots, \capacityf{m} : \intinterval{0}{\horizon} \to \Nzero %
+                                             \capacityf{1}, \dots, \capacityf{m} : \intinterval{1}{\horizon} \to \Nzero %
                                              $} \nonumber \\
     \text{find}       && \multicolumn{4}{l}{$\Schedule = (\jobstart{1}, \dots, \jobstart{n}) \in \N^n$} \nonumber \\
     \text{minimizing} && \sum_{j \in \Jobs} \tardinessweight{j} \tardiness{j}
@@ -139,10 +139,10 @@ In the following sections, we will consider the stated constraints as potential 
 and how to relax specific constraints should they be identified as bottlenecks.
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\section{Bottlenecks} \label{sec:bottlenecks}
+\section{Bottlenecks} \label{sec:problem-statement/bottlenecks}
 
 Our goal will be to find bottlenecks in the problem, specifically in the obtained schedule
---- in the solution to the constraint-programming model defined in \cref{sec:constraint-programming-model}.
+--- the solution to the constraint-programming model defined in \cref{sec:problem-statement/constraint-programming-model}.
 Firstly, we state a general definition of a execution-level bottleneck:
 
 \begin{defn*}[\acf{ebm} \citep{WANG2016}]\label{def:bottleneck}
@@ -169,6 +169,13 @@ we are limited to considering only the resource capacity constraints \eqref{csp:
 Those constraints limit the cumulative consumption of jobs scheduled during a given time period
 to be no more than the available capacities of all the resources during that time period,
 constrained for each of the resources separately.
+Constraints \eqref{csp:precedences} cannot be relaxed by definition of the problem
+--- jobs cannot start until all their predecessors have finished executing%
+\footnote{One could imagine that scheduling jobs might require preparations,
+which do not necessarily require the presence of the product about to be processed.
+Those preparations could therefore be allowed to start even before the predecessor jobs finish executing.
+However, we can assume that those preparations are completed before the start,
+or we can assume no preparation time at all.}.
 
 The cumulative consumption is dependent on the constructed schedule and the given problem instance.
 Its value changes significantly with changing of the schedule,
@@ -208,7 +215,7 @@ Illustrative example of a capacity addition and a capacity migrations is shown i
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.7\textwidth]{img/Capacities-Changes.pdf}
+    %\includegraphics[width=0.7\textwidth]{img/Capacities-Changes.pdf}
     \caption{Diagram of possible capacity changes}
     \label{fig:CapacityChanges}
 \end{figure}
@@ -226,7 +233,7 @@ For a modified instance $\Instance^*$, the sets of all migrations and additions 
 $\Migrations^{\Instance^*}$ and $\Additions^{\Instance^*}$, respectively.
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\section{Alternative schedule} \label{sec:alternative-schedule}
+\section{Alternative schedule} \label{sec:problem-statement/alternative-schedule}
 
 In the rest of this chapter, we define a general procedure for solving the presented problem,
 identifying bottlenecks and relaxing corresponding constraints by modifying the initial problem,

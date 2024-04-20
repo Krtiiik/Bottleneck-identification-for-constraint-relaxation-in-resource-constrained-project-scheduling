@@ -1,19 +1,86 @@
-\chapter{Numerical experiments}
+\chapter{Numerical experiments} \label{chap:numerical-experiments}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\section{Setup}
+\section{Setup} \label{sec:numerical-experiments/setup}
+
+In this section, we will present benchmark instances used for evaluating the proposed methods and algorithms,
+we will describe the modification process for creating problem instances suited to our studied problem,
+briefly describe how we model the problem in the constraint-programming model
+(as described in \cref{sec:problem-statement/constraint-programming-model},
+and how we obtain optimal solutions to the modeled problem using a black-box solver.
+
+% -----------------------------------------------------------------------------------------------------------
+\subsection*{Instances} \label{subsec:numerical-experiments/setup/instances}
+
+\citet{KOLISCH1997} created a set of benchmark instances\footnote{Available online at \url{https://www.om-db.wi.tum.de/psplib/}}
+for the \ac{rcpsp}.
+This set has since been used to evaluate and compare many results in literature.
+(For example, some recent papers from \citet{Bianco2011}, \citet{Cheng2015}, or \citet{Elsayed2017}.)
+To fully model the studied problem, we introduce several modifications to the original instances.
+Namely, we split the precedence graph to create individual order components,
+introduce job deadlines and time-variable resource capacities,
+and to maintain feasibility when modeling specific production systems
+we scale down job durations and resource consumptions.
+Following are the modification steps in more detail.
+
+First, we split the single-component precedence graph into disconnected components,
+creating an inforest.
+We do this by ordering the jobs topologically
+and selecting one of the last topological generations as seed jobs%
+\footnote{The depth of the selected generation influences the number of created components
+and the overall structure of the created intree forest.}.
+Incrementally, starting with the preceding generation and continuing in the reverse order of topological generations,
+each job from preceding generations selects a single successor precedence to connect to a successor job.
+Analogously, each job from succeeding generations selects a single predecessor precedence to connect to a predecessor job.
+After splitting the graph into an inforest, the sink-roots of the intrees are selected as orders $\Orders$.
+
+Second, we limit the resource availabilities to simulate working shifts.
+The capacity availability function of a resources is a combination of a periodical availability formed by periodical intervals
+combined with single-time availabilities formed by exception intervals.
+Base problem instances only contain periodical intervals,
+exception intervals are later used as instance modifications.
+We use periodical availability intervals, sub-intervals of $\intinterval{1}{24}$,
+to denote that a resource is available each day during the specified time intervals.
+During those intervals the resource capacity is set to $\shiftcapacity{k}$ --- its defined shift capacity;
+outside those intervals the capacity is set to $0$.
+Exception intervals, sub-intervals of $\intinterval{1}{\horizon}$, are used
+to denote a one-time resource availability change of a specified capacity.
+This change can be either positive or negative.
+A positive change can increase the resource capacity from $0$ during time periods not covered by periodical intervals
+and thus make the resource newly available.
+It can also cause the capacity to exceed its shift capacity $\shiftcapacity{k}$.
+Negative change can decrease the capacity from its shift capacity $\shiftcapacity{k}$,
+in the extreme case make it unavailable as a result.
+It cannot decrease the capacity lower than $0$.
+
+Third, we introduce job deadlines.
+
+
+\todo{HEEEEEEEEERE}
+
+\todo{which instances we use}
+
+\todo{modifications - fully described here or just summary + appendix?}
+
+% -----------------------------------------------------------------------------------------------------------
+\subsection*{Solving the CP model} \label{subsec:numerical-experiments/setup/solving-cp-model}
+
+
+
+% -----------------------------------------------------------------------------------------------------------
+\subsection*{Instance modifications} \label{subsec:numerical-experiments/setup/instance-modifications}
+
+
+
+\subsection*{}
 
 \begin{itemize}
     \item PSPLIB instances
-        Those are Series–parallel graphs. (See the survey of \citep{PROT2017} for comparison of graph types
-        used in scheduling.) We would, however, prefer precedence graphs which correspond better to our problem.
-
-
-
-        \citet{KOLISCH1997} created a set of benchmark instances for resource-constrained project scheduling%
-        \footnote{Available online at \url{https://www.om-db.wi.tum.de/psplib/}}.
-        This set has since been used to \wording{evaluate many results in literature}. We select some of the instances
-        to use in our experiments.
+        The instance graphs of PSPLIB instances are series-parallel graphs.
+        (See the survey of \citep{PROT2017} for comparison of graph types used in scheduling.)
+        We are, however, focused on problem instances with intree precedence graphs.
+        To obtain problem instances with such graphs,
+        we split the PSPLIB instance graphs into several disconnected trees 
 
         The instances are, however, missing some properties required to \wording{properly simulate our experiments},
         namely: job deadlines, orders (with related tardiness weights) and variable capacities. We introduce
@@ -40,6 +107,11 @@
         \todo{Due dates}
 
     \item Solving the CP model
+    \begin{itemize}
+        \item We use \todo{cite or something} the \ac{docplex} Python API for modeling the problems
+            and the IBM ILOG CP Optimizer for finding optimal solutions to the modeled problems.
+    \end{itemize}
+    
 
     \item Modifying the instances based on the solutions proposed earlier
 
@@ -63,7 +135,7 @@
 \end{itemize}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\section{Comparative results}
+\section{Comparative results} \label{sec:numerical-experiments/comparative-results}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\section{Discussion}
+\section{Discussion} \label{sec:numerical-experiments/discussion}
