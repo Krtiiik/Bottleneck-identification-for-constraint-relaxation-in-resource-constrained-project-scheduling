@@ -1,0 +1,68 @@
+\chapter{Attachments} \label{chap:attachments}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section{Algorithms, Functions, and Procedures} \label{sec:attachments/algorithms-functions-procedures}
+
+
+\begin{alg}{Function}{GranularResourceLoad}{$k$, $\Instance$, $\Schedule$, $PC$} \label{alg:granular-resource-load}
+\State $L : \intinterval{1}{PC} \to \Nzero$
+       \Comment Period load function
+\For {$j \in \JobsOnResource{k}$}
+    \State $i_l \gets \lfloor \jobstart{j} / \algGranularity \rfloor$,
+           \Comment{First overlapping period}
+    \State $i_h \gets \lfloor \jobend{j} / \algGranularity \rfloor$
+           \Comment{Last overlapping period}
+    \If {$i_l = i_h$}
+        \Comment{If the job overlaps with a single period...}
+        \State $L(i_l) \gets L(i_l) + \duration{j} \consumption{j}{k}$
+    \Else
+        \Comment{...the job overlaps with multiple periods}
+        \State $L(i_l) \gets L(i_l) + (\algGranularity (i_l + 1) - \jobstart{j}) \cdot \consumption{j}{k}$
+        \For {$i \in \intinterval{i_l+1}{i_h-1}$}
+            \State $L(i) \gets L(i) + \algGranularity \cdot \consumption{j}{k}$
+        \EndFor
+        \State $L(i_h) \gets L(i_h) + (\jobend{j} - \algGranularity (i_h - 1)) \cdot c$
+    \EndIf
+\EndFor
+\State \Return $L$
+\end{alg}
+
+
+\begin{alg}{Function}{IncreaseGranularPeriodCapacity}{$i$, $\capacityf{k}$, $\algGranularity$, $\algImprovement$} \label{alg:increase-granular-period-capacity}
+\State $t_l \gets 1+ (i-1)\algGranularity$
+       \Comment First time period covered
+\State $t_h \gets i \algGranularity$
+       \Comment Last time period covered
+\For{$t \in \intinterval{t_l}{t_h}$}
+    \State $\capacity{k}{t} \gets \capacity{k}{t} + \algImprovement$
+\EndFor
+\State \Return $\capacity{k}{t}$
+\end{alg}
+
+
+\begin{alg}{Function}{ReduceCapacityChanges}{$k$, $\capacityf{\text{orig}}$, $\Instance$, $\Schedule$} \label{alg:reduce-capacity-changes}
+\State $\capacityf{}^\prime: \intinterval{1}{\horizon} \to \Nzero$
+       \Comment Reduced capacity function
+\State $L \gets $ \Call{ResourceLoad}{$k$, $\Instance$, $\Schedule$}
+\For {$t \in \intinterval{1}{\horizon}$}
+    \State $\capacity{}{t}^\prime \gets \max(\capacity{\text{orig}}{t}, L(t))$
+\EndFor
+\State \Return $\capacityf{}^\prime$
+\end{alg}
+
+
+\begin{alg}{Function}{ResourceLoad}{$k$, $\Instance$, $\Schedule$} \label{alg:resource-load}
+\State $L : \intinterval{1}{\horizon} \to \Nzero$
+\For {$t \in \intinterval{1}{\horizon}$}
+    \State $L(t) \gets \sum_{j \in \JobsOnResourceInTimePeriod{k}{t}} \consumption{j}{k}$
+        \Comment $\JobsOnResourceInTimePeriod{k}{t}$ with respect to given schedule $\Schedule$
+\EndFor
+\State \Return $L$
+\end{alg}
+
+
+\begin{alg}{Function}{FindAdditionsAndMigrations}{...} \label{alg:find-additions-and-migrations}
+\State TODo
+\end{alg}
+
+

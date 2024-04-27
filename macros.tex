@@ -104,6 +104,7 @@
 \newcommand{\wording}[1]{%
     \textcolor{brown}{#1}% brown text
     \marginpar{\textcolor{brown}{$\Leftarrow$}}% Symbol on the side of the page
+    \PackageWarning{TODO}{#1}% Warning in LaTeX log
 }
 
 %%% Typography or something -------------------------------------------------------------
@@ -113,6 +114,8 @@
 \addcontentsline{toc}{section}{#1}
 }
 
+\newcommand*{\fullref}[1]{\hyperref[{#1}]{\autoref*{#1} - \nameref*{#1}}}
+
 % Custom referencable "steps" enumerate
 \newlist{steps}{enumerate}{10}
 \setlist[steps]{label*=\arabic*.}    
@@ -121,11 +124,62 @@
 
 % Tables stuff
 \newcommand{\tablenote}[2]{\multicolumn{#1}{p{0.95\textwidth}}{\footnotesize \emph{Note:} #2}}
-\newcommand{\cellrule}{\leaders\hbox{\rule[0.3em]{.1pt}{0.4pt}}\hfill\mbox{}}
+\newcommand{\cellrule}{\leavevmode%
+    \hskip-.2in%
+    \leaders%
+    \vtop{\hsize=.0025in\vskip-.05in.}%
+    \hfill%
+    \hskip.3in}
+
+%%% Algorithms --------------------------------------------------------------------------
+
+\algrenewcommand\algorithmicdo{\textbf{:}}
+\algrenewcommand\algorithmicthen{\textbf{:}}
+\algrenewcommand\algorithmicelse{\textbf{else:}}
+
+\algnewcommand\algorithmicinput{\textbf{Input:}}
+\algnewcommand\algorithmicinputc{\phantom{\textbf{Input:}}}
+\algnewcommand\algorithmicoutput{\textbf{Output:}}
+\algnewcommand\algorithmicoutputc{\phantom{\textbf{Output:}}}
+\algnewcommand\algorithmicparams{\textbf{Parameters:}}
+\algnewcommand\algorithmicparamsc{\phantom{\textbf{Parameters:}}}
+\algnewcommand\algorithmicforiter{\phantom{\textbf{For}}}
+
+\algnewcommand\Input{\item[\algorithmicinput]}%
+\algnewcommand\Inputc{\item[\algorithmicinputc]}%
+\algnewcommand\Output{\item[\algorithmicoutput]}%
+\algnewcommand\Outputc{\item[\algorithmicoutputc]}%
+\algnewcommand\Params{\item[\algorithmicparams]}%
+\algnewcommand\Paramsc{\item[\algorithmicparamsc]}%
+\algnewcommand\Note{\footnotesize\item[\textit{Note:}]}%
+\newcommand{\Callref}[3]{\hyperref[{#3}]{\Call{#1}{#2}}}
+\newcommand{\algnameref}[2]{\hyperref[{#2}]{\textproc{#1}}}
+
+\algdef{SE}[REPEATITER]{Repeat}{ForIter}{\textbf{repeat:}}[1]{\textbf{for}\ #1\ \textbf{iterations}}%
+\newcommand{\Statec}[1]{\Statex\hspace{#1em}}
+\newcommand{\Statecr}{\item[]\hfill}
+
+\newcounter{algcounter}
+\renewcommand{\thealgcounter}{\arabic{algcounter}}
+\newenvironment{alg}[3]
+    {%
+    \refstepcounter{algcounter}%
+    \par\vspace{1.5em}
+    \noindent\textbf{#1}\ \textproc{#2}\ifthenelse{\equal{#3}{}}{}{(#3)}
+    \hrule\vspace{.2em}
+    \begin{algorithmic}[1]
+    }
+    {
+    \end{algorithmic}
+    \vspace{1em}
+    }
 
 %%% Math --------------------------------------------------------------------------------
 \newcommand{\defeq}{\overset{\text{def}}{=}}
-\newcommand{\intinterval}[2]{[{#1}..{#2}]}
+\newcommand{\intinterval}[2]{\{{#1}, \dots, {#2}\}}
+\DeclareMathOperator*{\avg}{\operatorname{avg}}
+\DeclareMathOperator*{\argmax}{\operatorname{argmax}}
+\DeclareMathOperator*{\argmin}{\operatorname{argmin}}
 
 % Notation
 \NewDocumentCommand{\supscriptable}{m m e{^}}{
@@ -135,6 +189,9 @@
         #1^{#2}%
     }
 }
+
+\newcommand{\Problem}{$PSm \;|\; intree \;|\; \sum_{j} w_j T_j$}
+
 \newcommand{\Instance}{\mathcal{I}}
 \newcommand{\precedence}[2]{#1 \hspace{-0.2em} \rightarrow \hspace{-0.2em} #2}
 \newcommand{\Jobs}{\mathcal{J}}
@@ -144,7 +201,7 @@
 \newcommand{\horizon}{\mathcal{T}}
 
 \newcommand{\duration}[1]{p_{#1}}
-\newcommand{\deadline}[1]{\tilde{d}_{#1}}
+\newcommand{\deadline}[1]{d_{#1}}
 \newcommand{\tardinessweight}[1]{w_{#1}}
 \newcommand{\capacity}[2]{\supscriptable{R_{#1}}{(#2)}}
 \newcommand{\capacityf}[1]{R_{#1}}
@@ -166,12 +223,28 @@
 
 \newcommand{\modelConsumption}[3]{\operatorname{c}_{#1 #2}^{(#3)}}
 
+\newcommand{\resourceLoad}[1]{L_{#1}}
+
 % Indicators
 \newcommand{\indicator}[2]{\operatorname{#1}_{#2}}
 
 \newcommand{\indMW}[1]{\indicator{MW}{#1}}
 \newcommand{\indMUR}[1]{\indicator{MUR}{#1}}
 \newcommand{\indAUAD}[1]{\indicator{AUAD}{#1}}
+\newcommand{\indRS}[1]{\indicator{RS}{#1}}
+\newcommand{\indRC}[1]{\indicator{RC}{#1}}
 \newcommand{\indMRW}[1]{\indicator{MRW}{#1}}
 \newcommand{\indMRUR}[1]{\indicator{MRUR}{#1}}
-\newcommand{\indAUAC}[1]{\indicator{AUAC}{#1}}
+\newcommand{\indAUAU}[1]{\indicator{AUAU}{#1}}
+\newcommand{\indPRU}[2]{\indicator{PRU}{#1}^{(#2)}}
+
+\newcommand{\JobsOnResource}[1]{\Jobs_{#1}}
+\newcommand{\JobsOnResourceInTimePeriod}[2]{\Jobs_{#1}^{(#2)}}
+\newcommand{\JobsOnResourceInPeriod}[2]{\Jobs_{#1}^{UAP(#2)}}
+
+\newcommand{\algIndicator}{\mathrm{I}}
+\newcommand{\algConvolution}{\mathrm{C}}
+\newcommand{\algMaxiter}{I_{\max}}
+\newcommand{\algGranularity}{\mathrm{G}}
+\newcommand{\algMaxperiods}{P_{\max}}
+\newcommand{\algImprovement}{\Delta}

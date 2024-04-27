@@ -1,40 +1,51 @@
 \chapwithtoc{Notation} \label{sec:notation}
 
-\begin{table}[h]
+\todo{Other indicators}
+\begin{table}[h!]
     \centering
-    \begin{tabular}{ll}
+    \begin{tabularx}{\textwidth}{lX}
         \textbf{Symbol} & \textbf{Definition} \\
         \hline
-
         \\
+
         \textbf{Problem instances}      & \cellrule \\
         $\Instance = (\Jobs, \Precedences, \Resources, \Orders, \horizon)$ & Problem instance \\
         $n$                             & Number of jobs \\
         $\Jobs = \{ 1, \dots, n \}$     & Set of jobs \\
-        $p_j$                           & Processing time of job $j$ \\
-        $\deadline{j}$                  & Deadline for a job $j$ \\
-        $\tardinessweight{j}$           & Tardiness weight for a job $j$ \\
+        $\duration{j}$                  & Processing time of job~$j$ \\
+        $\deadline{j}$                  & Deadline for a job~$j$ \\
+        $\tardinessweight{j}$           & Tardiness weight for a job~$j$ \\
         $\precedence{i}{j}$ or $(i,j)$  & Precedence between jobs $i$ and $j$ \\
         $\Precedences$                  & Set of precedences \\
         $G = (\Jobs, \Precedences)$     & Precedence graph \\
         $m$                             & Number of resources \\
         $\Resources = \{1, \dots, m\}$  & Set of resources \\
-        $\capacityf{k}$                 & Capacity step function of resource $k$ \\
-        $\capacity{k}{t}$               & Capacity of resource $k$ in time period $t$ \\
-        $\shiftcapacity{k}$             & Shift capacity of a resource $k$ \\
-        $\consumption{j}{k}$            & Per-period consumption of a resource $k$ by a job $j$ \\
+        $\capacityf{k}$                 & Capacity step function of resource~$k$ \\
+        $\capacity{k}{t}$               & Capacity of resource $k$ in time period~$t$ \\
+        $\shiftcapacity{k}$             & Shift capacity of a resource~$k$ \\
+        $\consumption{j}{k}$            & Per-period consumption of a resource~$k$ by a~job~$j$ \\
         $\horizon$                      & Time horizon \\
         $1, \dots, \horizon$            & Time periods \\
         \\
 
         \textbf{Schedules, solutions}   & \cellrule \\
-        $\jobstart{j}$                                      & Start time of job $j$ \\
+        $\jobstart{j}$                                      & Start time of job~$j$ \\
         $\Schedule = (\jobstart{1}, \dots, \jobstart{n})$   & Schedule \\
-        $\jobend{j} = \jobstart{j} + \duration{j}$          & Completion time of job $j$ \\
+        $\jobend{j} = \jobstart{j} + \duration{j}$          & Completion time of job~$j$ \\
         $\Completions = (\jobend{1}, \dots, \jobend{n})$    & All completion times of jobs \\
         \\
 
-        \tablenote{2}{supper-scripting a value with a schedule symbol - for example
-        $\jobend{j}^{\Schedule}$ - relates that value to the specified schedule.} \\
-    \end{tabular}
+        \textbf{Identification indicators}   & \cellrule \\
+        $\indMUR{k}$                                                    & The \acl{mur} of a resource~$k$ \\
+        $\indAUAU{k}$                                                   & The \acl{auau} of a resource~$k$ \\
+        $\JobsOnResource{k} = \{j \in \Jobs : \consumption{j}{k} > 0\}$
+            & The set of jobs executed on the resource $k$ \\
+        $\JobsOnResourceInPeriod{k}{i} = \{ j \in \JobsOnResource{k} : a_{ki}^{S} \leq \jobstart{j} \leq a_{ki}^{E} \}$
+            & The set of jobs executed on the resource $k$ during the uninterrupted active period $i$
+              (used in the definition of \ac{auau})\\
+        \\
+
+        \tablenote{2}{supper-scripting a value with a schedule symbol --- for example
+        $\jobend{j}^{\Schedule}$ --- relates that value to the specified schedule.} \\
+    \end{tabularx}
 \end{table}

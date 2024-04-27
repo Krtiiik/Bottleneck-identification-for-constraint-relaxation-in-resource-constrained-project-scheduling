@@ -7,21 +7,37 @@ In this section, we will present benchmark instances used for evaluating the pro
 we will describe the modification process for creating problem instances suited to our studied problem,
 briefly describe how we model the problem in the constraint-programming model
 (as described in \cref{sec:problem-statement/constraint-programming-model},
-and how we obtain optimal solutions to the modeled problem using a black-box solver.
+and how we obtain (near) optimal solutions to the modeled problem using a black-box solver.
+
+All processing described in the following subsections was done in Python using a library
+developed specifically for the purposes of this thesis. \todo{more info?}
 
 % -----------------------------------------------------------------------------------------------------------
-\subsection*{Instances} \label{subsec:numerical-experiments/setup/instances}
+\subsection{Instances} \label{subsec:numerical-experiments/setup/instances}
 
-\citet{KOLISCH1997} created a set of benchmark instances\footnote{Available online at \url{https://www.om-db.wi.tum.de/psplib/}}
-for the \ac{rcpsp}.
+\citet{Kolisch1997} created PSPLIB%
+\footnote{Available online at \url{https://www.om-db.wi.tum.de/psplib/}}
+--- set of benchmark instances for the \ac{rcpsp}.
 This set has since been used to evaluate and compare many results in literature.
 (For example, some recent papers from \citet{Bianco2011}, \citet{Cheng2015}, or \citet{Elsayed2017}.)
+
+\todo{Describe the original instances}
+
 To fully model the studied problem, we introduce several modifications to the original instances.
 Namely, we split the precedence graph to create individual order components,
 introduce job deadlines and time-variable resource capacities,
 and to maintain feasibility when modeling specific production systems
 we scale down job durations and resource consumptions.
 Following are the modification steps in more detail.
+
+Initially, to model a system with fewer resources than 4,
+we remove the undesired resources from the problem instance
+and optionally adjust the resource consumption of jobs.
+Should there be a job without any required resource consumption
+(due to the removal of all the resources the job was consuming)
+the total removed consumption is distributed among the remaining resources;
+otherwise, the job consumption is not altered.
+We then continue with modifications common for all instances.
 
 First, we split the single-component precedence graph into disconnected components,
 creating an inforest.
@@ -54,85 +70,67 @@ in the extreme case make it unavailable as a result.
 It cannot decrease the capacity lower than $0$.
 
 Third, we introduce job deadlines.
+As stated in \cref{sec:problem-statement/scheduling,sec:problem-statement/constraint-programming-model},
+it is sufficient to set deadlines for order jobs $j \in \Orders$ only.
+Those were set manually to simulate continuous distribution of orders in time
+as they would appear in a real order-based manufacturing system.
 
-
-\todo{HEEEEEEEEERE}
+Finally, based on the previously stated modifications,
+should the introduction of variable resource availabilities make the problem infeasible,
+--- a solution to the problem could no longer be found ---
+the durations of jobs are scaled down appropriately.
+Such infeasibility can be introduced by limiting resource availabilities to shifts
+where the shifts of two resources consumed by a job do not overlap
+or overlap for a time duration smaller than the required execution duration of the job.
+Given that preemption is not allowed and job resource consumptions have to be concurrent,
+the maximal duration $\duration{\text{max}}$ of a job in a problem instance is set to be the length of maximal overlap
+of all the resources' availabilities in the problem instance.
+Then, the durations of all jobs are scaled-down as follows
+$\duration{j} \gets (\duration{j} \cdot \duration{\text{max}}) / \max\{\duration{j} \;|\; j \in \Jobs \}$.
 
 \todo{which instances we use}
 
-\todo{modifications - fully described here or just summary + appendix?}
+% -----------------------------------------------------------------------------------------------------------
+\subsection{Solving the constraint-programming model} \label{subsec:numerical-experiments/setup/solving-cp-model}
+
+We use the \ac{docplex}%
+\footnote{See online at \url{https://ibmdecisionoptimization.github.io/docplex-doc/cp/index.html}.}
+Python API for modeling the problems
+and the \ac{cpopt}%
+\footnote{See online at \url{https://www.ibm.com/products/ilog-cplex-optimization-studio/cplex-cp-optimizer}. \citep{WEB_IBM_CPLEX}}
+for finding optimal solutions to the modeled problems.
+
+\todo{The solver time limit was set to 10 seconds.
+Upon reaching the time limit without optimality verification,
+the best solution found so far was used.}
 
 % -----------------------------------------------------------------------------------------------------------
-\subsection*{Solving the CP model} \label{subsec:numerical-experiments/setup/solving-cp-model}
+\subsection{Instance modifications} \label{subsec:numerical-experiments/setup/instance-modifications}
 
+\subsection{Methods of evaluation} \label{subsec:numerical-experiments/setup/methods-of-evaluation}
 
-
-% -----------------------------------------------------------------------------------------------------------
-\subsection*{Instance modifications} \label{subsec:numerical-experiments/setup/instance-modifications}
-
-
-
-\subsection*{}
-
+Having the solution $\Schedule$ to the original problem instance $\Instance$
+and the solution $\Schedule^*$ to the modified problem instance $\Instance^*$,
+we compute the following:
 \begin{itemize}
-    \item PSPLIB instances
-        The instance graphs of PSPLIB instances are series-parallel graphs.
-        (See the survey of \citep{PROT2017} for comparison of graph types used in scheduling.)
-        We are, however, focused on problem instances with intree precedence graphs.
-        To obtain problem instances with such graphs,
-        we split the PSPLIB instance graphs into several disconnected trees 
-
-        The instances are, however, missing some properties required to \wording{properly simulate our experiments},
-        namely: job deadlines, orders (with related tardiness weights) and variable capacities. We introduce
-        those as extensions to the original instances.
-
-        First, we split the single-component precedence graph (a series-parallel graph) into disconnected
-        components, creating an inforest. We do this by ordering the jobs topologically, then selecting one
-        of the last topological generations as the seed jobs%
-            \footnote{The depth of the selected generation influences the number of created components and the
-            overall structure of the created intree forest.}.
-        Then incrementally, starting from the neighboring generations, for each job from each preceding generation
-        a single successor precedence is selected for connecting the job to a single successor. Analogously,
-        for each job from each succeeding generation a single predecessor precedence is selected.
-        After splitting the graph into an inforest, the roots of the intrees are selected as orders $\Orders$.
-
-        Second, we limit the resource availabilities to simulate working shifts. The capacity availability function
-        of resources is a result of periodical availabilities from periodical intervals combined with single-time
-        availabilities from exception intervals. We use periodical availability intervals, subintervals of $[1 .. 24]$,
-        to denote that a resource is available (maximum capacity $\shiftcapacity{k}$) each day during the specified time
-        intervals. Exception intervals, subinterals of $[1 .. \horizon]$, are used to denote a one-time resource
-        availability change of a specified capacity. During time periods not covered by any intervals the capacity
-        of the resource is zero.
-
-        \todo{Due dates}
-
-    \item Solving the CP model
-    \begin{itemize}
-        \item We use \todo{cite or something} the \ac{docplex} Python API for modeling the problems
-            and the IBM ILOG CP Optimizer for finding optimal solutions to the modeled problems.
-    \end{itemize}
-    
-
-    \item Modifying the instances based on the solutions proposed earlier
-
-    \item Methods of evaluation
-    
-        Having the solution $\Schedule$ to the original problem instance $\Instance$
-        and the solution $\Schedule^*$ to the modified problem instance $\Instance^*$,
-        we compute the following:
-        \begin{itemize}
-            \item Tardiness improvement = $\tardiness{o} - \tardiness{o}^*$
-            \item Solution difference = $\sum_{j \in J} \abs{\jobend{j} - \jobend{j}^*}$
-            \item Upon specifying a capacity migration cost $\mathcal{C}_M$ and a capacity addition cost $\mathcal{C}_A$,
-                the instance modification cost =
-                \begin{align*}
-                    \sum_{k \in \Resources} \sum_{t \in \intinterval{0}{\horizon}}
-                    \big( &C_A \cdot [\capacity{k}{t} = 0] \cdot (\capacity{k}{t}^* - \capacity{k}{t} ) \\
-                    &+ C_M \cdot [\capacity{k}{t} > 0 \land \capacity{k}{t}^* > \capacity{k}{t}] \big)
-                \end{align*}
-
-        \end{itemize}
+    \item Tardiness improvement = $\tardiness{o} - \tardiness{o}^*$
+    \item Solution difference = $\sum_{j \in J} \abs{\jobend{j} - \jobend{j}^*}$
+    \item Upon specifying a capacity migration cost $\mathcal{C}_M$ and a capacity addition cost $\mathcal{C}_A$,
+        the instance modification cost =
+        \begin{align*}
+            \sum_{k \in \Resources} \sum_{t \in \intinterval{0}{\horizon}}
+            \big( &C_A \cdot [\capacity{k}{t} = 0] \cdot (\capacity{k}{t}^* - \capacity{k}{t} ) \\
+            &+ C_M \cdot [\capacity{k}{t} > 0 \land \capacity{k}{t}^* > \capacity{k}{t}] \big)
+        \end{align*}
+    \item Not relying on particular differences between instances and corresponding solutions
+        we also measure the computation time required to obtain each solution.
+        This computation time encompasses the full run of the algorithm
+        --- that includes computations on instances and solutions,
+        one or more calls to the \ac{cpopt},
+        and subsequent instance modifications.
 \end{itemize}
+
+\todo{notation, schema or something}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Comparative results} \label{sec:numerical-experiments/comparative-results}

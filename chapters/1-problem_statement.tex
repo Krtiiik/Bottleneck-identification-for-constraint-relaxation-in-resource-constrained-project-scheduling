@@ -1,6 +1,6 @@
 \chapter{Problem statement} \label{chap:problem-statement}
 
-In this chapter we firstly state the $PSm \;|\; intree \;|\; \sum_{j} w_j T_j$ variant of the \ac{rcpsp}.
+In this chapter, we first state an extension of the \ac{rcpsp} we will use to model our studied problem.
 Following this, we describe a constraint-programming method used to find solutions to the problem.
 Lastly, we present a formal framework for identifying bottlenecks, relaxing related constraints,
 and obtaining improved solutions.
@@ -8,66 +8,73 @@ and obtaining improved solutions.
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Scheduling} \label{sec:problem-statement/scheduling}
 
-We use the $PSm \;|\; intree \;|\; \sum_{j} w_j T_j$ problem\footnote{Schema defined by \citet{BRUCKER1999}.}
-to model the targeted real-world scheduling problem.
-Additionally, we extend the problem by introducing several new definitions to better model the addressed problem.
-Furthermore, we  introduce the notion of problem instances to help us distinguish between the original problem
+\toask{Further decompose into "Standard RCPSP" and "Modifications and extensions"?}
+
+We use the \Problem{} variant%
+\footnote{$\alpha | \beta | \gamma$ three-field notation defined by \citet{Brucker1999}.}
+of the \ac{rcpsp} to model the targeted real-world scheduling problem.
+We extend the problem by introducing several new definitions to better model the addressed problem.
+Furthermore, we introduce the notion of problem instances to help us distinguish between the original problem
 and its modifications, as described in \cref{sec:problem-statement/alternative-schedule}.
+All following definitions and values are assumed to be in the integer domain.
 
-A \emph{Problem instance} is a 4-tuple $\Instance = (\Jobs, \Precedences, \Resources, \horizon)$,
+\begin{defn}[Problem instance] \label{def:problem-instance}
+A \emph{Problem instance} $\Instance$ is a 4-tuple $(\Jobs, \Precedences, \Resources, \horizon)$,
 where
-
 \begin{itemize}
     \item $\Jobs = \{1, \dots, n\}$ is a set of \emph{jobs},
     \item $\Precedences$ is a set of all \emph{precedences} constraints,
     \item $\Resources = \{1, \dots, m\}$ is a set of \emph{resources},
-    \item $\horizon$ is the time horizon of the problem.
+    \item $\horizon$ is the time horizon of the problem instance.
 \end{itemize}
+\end{defn}
 
-Each job $j \in \Jobs$ has an execution \emph{duration} $\duration{j}$,
+Each job $j \in \Jobs$ has a \emph{duration} $\duration{j}$,
 describing the amount of time needed to process the job $j$.
 \emph{Preemption} of jobs is not allowed
---- the execution of an job cannot be interrupted after its start.
-Each job $j$ also has a \emph{deadline} $\deadline{j}$,
+--- the execution of a job cannot be interrupted after its start.
+Each job $j$ also has a \emph{due date} $\deadline{j}$,
 stating a time horizon in which the job should be completed;
 otherwise, it is considered \emph{tardy}.
 Subsequently, each job $j$ also has a \emph{tardiness weight} $\tardinessweight{j}$
 which defines a penalty accumulated for each unit of time the job is tardy for.
 
 Execution order of jobs is constrained with \emph{precedence constraints} $\Precedences$.
-A precedence constraint between jobs $i$ and $j$, denoted as $\precedence{i}{j}$ or $(i, j)$,
-states that processing of job $j$ can start only after the processing of job $i$ was completed.
+A precedence constraint between jobs $i$ and $j$,
+denoted as $\precedence{i}{j}$ or $(i, j) \in \Precedences$,
+states that the processing of job $j$ can start only after the processing of job $i$ was completed.
 
 Interpreting jobs $\Jobs$ as vertices and precedences $\Precedences$ as edges between the jobs,
 we define the \emph{precedence graph} $G = (\Jobs, \Precedences)$.
 We assume the precedence graph to be an \emph{inforest}, in other words,
 the precedences constrain the execution order of jobs in such a way that the resulting precedence graph
 is always an inforest.
-An inforest is a directed acyclic graph where each vertex has at most one successor.
+An~inforest is a directed acyclic graph where each vertex has at most one successor.
 A connected subgraph of an inforest is an \emph{intree}.
 
 Jobs are executed on \emph{resources} $\Resources$ --- machines with time-variant renewable \emph{capacities}.
-Capacity of a resource $k$ during a time period $t$ is denoted as $\capacity{k}{t}$.
+The capacity of a resource $k$ during a time period $t \in \intinterval{1}{\horizon}$ is denoted as $\capacity{k}{t}$.
 During their execution, jobs consume the capacities of resources.
 For a job $j$, the per-period consumption of a resource $k$ is denoted as $\consumption{j}{k}$.
 This describes how much of the resource's capacity is consumed each period during the job's execution.
 Capacities are renewable, meaning that each time period the specified amount of capacity is available,
 regardless of prior capacity consumptions.
-The resource capacity functions $\capacity{k}{t}$ are assumed periodical with the same period
-and the only value they take are $0$ and $\shiftcapacity{k} \negmedspace>\! 0$ for each corresponding resource $k$.
+The resource capacity functions $\capacity{k}{t}$ are assumed periodical with the same period of 24.
+Moreover, the resource capacity function of the resource $k$ only takes the values
+$0$ and $\shiftcapacity{k} \negmedspace>\! 0$.
 This assumption, however, is only for the initial problem instance
 --- resource capacity functions of modified instances, as described in \cref{sec:problem-statement/alternative-schedule},
-can be non-periodical and take arbitrary integer values.
+can be non-periodical and take arbitrary non-negative integer values.
 
-The set of orders $\Orders = \{ j \in \Jobs \mid \nexists i : \precedence{j}{i} \}$
+The set of \emph{orders} $\Orders = \{ j \in \Jobs \mid \nexists i : \precedence{j}{i} \}$
 is the set of roots of the precedence intrees,
 i.e. the set of all jobs for which no precedence successor exists.
-If a job is contained in the set of orders $\Orders$, we call it an \emph{order}.
+A job $j \in \Orders$ is called an \emph{order}.
 
 We make a simple observation; due to the intree-structure,
 each (weakly) connected component in the precedence graph contains exactly one order.
-From this, we can say that each job is associated with a specific order,
-where associated states that the job is in the same component as that order.
+From this, we can say that each job is either an order
+or is associated with a unique order within the same intree component.
 
 Having introduced orders, we can now specify the ranges of job deadlines and tardiness weights
 based on whether a job belongs to the orders set $\Orders$:
@@ -141,14 +148,16 @@ and how to relax specific constraints should they be identified as bottlenecks.
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Bottlenecks} \label{sec:problem-statement/bottlenecks}
 
+\toask{Further decompose into "Definition" and "Relaxations" or something?}
+
 Our goal will be to find bottlenecks in the problem, specifically in the obtained schedule
 --- the solution to the constraint-programming model defined in \cref{sec:problem-statement/constraint-programming-model}.
-Firstly, we state a general definition of a execution-level bottleneck:
+Firstly, we state a general definition of an execution-level bottleneck:
 
-\begin{defn*}[\acf{ebm} \citep{WANG2016}]\label{def:bottleneck}
+\begin{defn}[\acf{ebm} \citep{Wang2016}] \label{def:bottleneck}
     \emph{\ac{ebm}} is a machine that dominates the scheduling performance in the strongest manner
     at the execution level of production systems.
-\end{defn*}
+\end{defn}
 
 The execution level of a production system stated here refers to finding bottlenecks
 specific to the given problem instance and the obtained solution to that instance.
@@ -215,7 +224,7 @@ Illustrative example of a capacity addition and a capacity migrations is shown i
 
 \begin{figure}
     \centering
-    %\includegraphics[width=0.7\textwidth]{img/Capacities-Changes.pdf}
+    \includegraphics[width=0.7\textwidth]{img/Capacities-Changes.pdf}
     \caption{Diagram of possible capacity changes}
     \label{fig:CapacityChanges}
 \end{figure}
