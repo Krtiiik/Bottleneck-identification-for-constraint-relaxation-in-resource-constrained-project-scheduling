@@ -1,14 +1,12 @@
 \chapter{Problem statement} \label{chap:problem-statement}
 
-In this chapter, we first state an extension of the \ac{rcpsp} we will use to model our studied problem.
-Following this, we describe a constraint-programming method used to find solutions to the problem.
+In this chapter, we first state an extension of the \ac{rcpsp} that we will use to model our studied problem.
+Following this, we describe a constraint programming method used to find solutions to the problem.
 Lastly, we present a formal framework for identifying bottlenecks, relaxing related constraints,
 and obtaining improved solutions.
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Scheduling} \label{sec:problem-statement/scheduling}
-
-\toask{Further decompose into "Standard RCPSP" and "Modifications and extensions"?}
 
 We use the \Problem{} variant%
 \footnote{$\alpha | \beta | \gamma$ three-field notation defined by \citet{Brucker1999}.}
@@ -29,6 +27,8 @@ where
 \end{itemize}
 \end{defn}
 
+\todo{RCPSP schedule diagram}
+
 Each job $j \in \Jobs$ has a \emph{duration} $\duration{j}$,
 describing the amount of time needed to process the job $j$.
 \emph{Preemption} of jobs is not allowed
@@ -37,7 +37,7 @@ Each job $j$ also has a \emph{due date} $\deadline{j}$,
 stating a time horizon in which the job should be completed;
 otherwise, it is considered \emph{tardy}.
 Subsequently, each job $j$ also has a \emph{tardiness weight} $\tardinessweight{j}$
-which defines a penalty accumulated for each unit of time the job is tardy for.
+which defines a penalty accumulated for each unit of time the job is tardy.
 
 Execution order of jobs is constrained with \emph{precedence constraints} $\Precedences$.
 A precedence constraint between jobs $i$ and $j$,
@@ -51,6 +51,7 @@ the precedences constrain the execution order of jobs in such a way that the res
 is always an inforest.
 An~inforest is a directed acyclic graph where each vertex has at most one successor.
 A connected subgraph of an inforest is an \emph{intree}.
+See \cref{fig:inforest} for a precedence graph example.
 
 Jobs are executed on \emph{resources} $\Resources$ --- machines with time-variant renewable \emph{capacities}.
 The capacity of a resource $k$ during a time period $t \in \intinterval{1}{\horizon}$ is denoted as $\capacity{k}{t}$.
@@ -75,28 +76,40 @@ We make a simple observation; due to the intree-structure,
 each (weakly) connected component in the precedence graph contains exactly one order.
 From this, we can say that each job is either an order
 or is associated with a unique order within the same intree component.
+This is demonstrated in \cref{fig:inforest}.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.6\textwidth]{img/Inforest.pdf}
+    \caption{
+        Example of a precedence graph.
+        The inforest structure of the graph is demonstrated.
+        Additionally, orders as the roots of the intrees are highlighted.}
+    \label{fig:inforest}
+\end{figure}
 
 Having introduced orders, we can now specify the ranges of job deadlines and tardiness weights
 based on whether a job belongs to the orders set $\Orders$:
 
 $$
-\deadline{j} \begin{cases}
-    \in \N    &\dots\;   j     \in \Orders \\
-    +\infty   &\dots\;   j \not\in \Orders
+\deadline{j} = \begin{cases}
+    a \in \Nzero  &\dots\;   \text{if $j \in \Orders$} \\
+    +\infty       &\dots\;   \text{otherwise}
 \end{cases}
 \qquad
-\tardinessweight{j} \begin{cases}
-    \geq 0   &\dots\;   j     \in \Orders \\
-       = 0   &\dots\;   j \not\in \Orders
+\tardinessweight{j} = \begin{cases}
+    a \geq 0  &\dots\;   \text{if $j     \in \Orders$} \\
+    0         &\dots\;   \text{otherwise}
 \end{cases}
 $$
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Constraint programming model} \label{sec:problem-statement/constraint-programming-model}
 
-We formulate the problem using a constraint programming model.
+We formulate the above problem using a constraint programming model.
 This provides us with a well-functioning framework
 and allows us to use existing solvers for finding optimal solutions.
+The model can be stated as:
 
 \begin{align}
     \text{given}      && \multicolumn{4}{l}{$\Jobs = (1, \dots, n) ,\;%
@@ -121,38 +134,39 @@ and allows us to use existing solvers for finding optimal solutions.
                       \label{csp:precedences} \\
                       && \sum_{j \in \Jobs} \modelConsumption{j}{k}{t}
                       & \leq \capacity{k}{t}
-                      && \forall t \in 1, \dots, \horizon \; \forall k \in \Resources
+                      && \forall t \in \intinterval{1}{\horizon} \; \forall k \in \Resources
                       \label{csp:capacities} \\
     \text{where}      && \multicolumn{4}{l}{$\Completions = (\jobstart{1} + \duration{1}, \dots, \jobstart{n} + \duration{n}) ,\;%
                                              \tardiness{j} = \max(0, \jobend{j} - \deadline{j}) ,\;%
                                              $} \nonumber \\
                       && \multicolumn{4}{l}{$\modelConsumption{j}{k}{t} \defeq \begin{cases}
-                                                 \consumption{j}{k} & \jobstart{j} \leq t < \jobend{j} \\
+                                                 \consumption{j}{k} & \text{if $\jobstart{j} \leq t < \jobend{j}$} \\
                                                  0                  & \text{otherwise}
                                                  \end{cases}
                                              $} \nonumber
 \end{align}
 
-Inequalities \eqref{csp:precedences} formulate the precedence constraints --- start and end times of jobs
+Inequalities \eqref{csp:precedences} formulate the precedence constraints --- start and finish times of jobs
 are according to all the precedences.
 Inequalities \eqref{csp:capacities} formulate the resource capacity constraints --- in every time period
 the combined consumption of jobs scheduled during the period cannot exceed any of the resource's capacities.
 Expression \eqref{csp:objective} is the optimization minimization objective --- the weighted tardiness of jobs.
 
-We assume we have a black-box solver available,
-which is able to find solutions to the problem modeled through constraint-programming in reasonable time.
+We assume we have a solver capable of solving \eqref{csp:objective}--\eqref{csp:capacities} in reasonable time
+through the use of constraint programming.
 
 In the following sections, we will consider the stated constraints as potential bottlenecks
-and how to relax specific constraints should they be identified as bottlenecks.
+and how to relax specific constraints identified as bottlenecks.
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Bottlenecks} \label{sec:problem-statement/bottlenecks}
 
-\toask{Further decompose into "Definition" and "Relaxations" or something?}
+% -----------------------------------------------------------------------------------------------------------
+\subsection{Definition} \label{subsec:problem-statement/bottlenecks/definition}
 
 Our goal will be to find bottlenecks in the problem, specifically in the obtained schedule
---- the solution to the constraint-programming model defined in \cref{sec:problem-statement/constraint-programming-model}.
-Firstly, we state a general definition of an execution-level bottleneck:
+--- the solution to the constraint programming model defined in \cref{sec:problem-statement/constraint-programming-model}.
+First, we state a general definition of an execution-level bottleneck:
 
 \begin{defn}[\acf{ebm} \citep{Wang2016}] \label{def:bottleneck}
     \emph{\ac{ebm}} is a machine that dominates the scheduling performance in the strongest manner
@@ -161,10 +175,10 @@ Firstly, we state a general definition of an execution-level bottleneck:
 
 The execution level of a production system stated here refers to finding bottlenecks
 specific to the given problem instance and the obtained solution to that instance.
-This is consistent with our goal of finding bottlenecks in the specific problem instances and their solutions,
-and improving the performance of the system only with respect to the currently presented problems.
+This is consistent with our goal of finding bottlenecks in the particular problem instances and their solutions,
+and improving the system performance only with respect to the currently presented problem.
 In contrast, we will not be interested in bottlenecks of the whole system
-nor in generally improving the performance of the system regardless of the problem.
+nor in generally improving the performance of the system regardless of the problem instance.
 Having made the distinction, we will now discuss our interpretation of the definition suited to our problem.
 
 Instead of identifying just a single machine as a bottleneck
@@ -173,44 +187,70 @@ we will focus on identifying specific time periods on specific machines as sched
 This allows us to relax only the specific constraints related to the identified time periods,
 resulting in localized modifications with minimal costs.
 
-With focusing on constraints related to resources during specific time periods,
-we are limited to considering only the resource capacity constraints \eqref{csp:capacities}.
-Those constraints limit the cumulative consumption of jobs scheduled during a given time period
-to be no more than the available capacities of all the resources during that time period,
-constrained for each of the resources separately.
-Constraints \eqref{csp:precedences} cannot be relaxed by definition of the problem
---- jobs cannot start until all their predecessors have finished executing%
-\footnote{One could imagine that scheduling jobs might require preparations,
-which do not necessarily require the presence of the product about to be processed.
-Those preparations could therefore be allowed to start even before the predecessor jobs finish executing.
-However, we can assume that those preparations are completed before the start,
-or we can assume no preparation time at all.}.
+% -----------------------------------------------------------------------------------------------------------
+\subsection{Constraints relaxation} \label{subsec:problem-statement/bottlenecks/constraints-relaxation}
 
-The cumulative consumption is dependent on the constructed schedule and the given problem instance.
-Its value changes significantly with changing of the schedule,
-which is an essential part of the black-box scheduling process.
-This process is guided by the objective expression \eqref{csp:objective} and cannot be influenced.
-Although the job tardiness weights $\tardinessweight{j}$ can potentially be changed,
-we consider those as part of the problem definition,
-stating the predefined importance of each of the orders,
-and thus we will not allow their modifications.
-Equally, job resource consumptions $\consumption{j}{k}$ influence the cumulative value,
-but due to the nature of our problem,
-we cannot modify the resource consumptions as those are predefined by the corresponding real-life
-execution and operation requirements.
+When deciding which constraints to relax,
+we have two constraints to consider: precedence constraints \eqref{csp:precedences}
+and resource capacity constraints \eqref{csp:capacities}.
+We will discuss individual segments that form the constraints,
+considering their possible relaxation.
 
-On the contrary, available capacities of resources can be modified with reasonable correspondence
-to modifications of the real-life problem.
-More specifically, capacity of a resource during a time period can be increased or decreased.
-Increasing the capacity of a resource during specific time periods could correspond to increasing
-the number of workers operating the resource machine,
-assuming that increasing the number of operating workers increases the total processing capacity.
-While sole reduction of capacities would not relax the constraints much, rather tighten them,
-decreasing capacity of one resource by a specific amount while increasing the capacity of another resource
-by the same amount could tighten the constraints on the former resource but relax the constraints on the later.
-This decreasing of the capacity of one resource while increasing the capacity of another by the same amount
-could correspond to migrating workers between the resource machines,
-assuming that the changes of operating workers are possible.
+\begin{enumerate}[label=(\roman*)]
+    \item \emph{Job precedences}
+    Job precedence constraints are inherent to the problem ---
+    --- jobs cannot start until all their predecessors have finished executing.
+    We cannot remove individual precedences as a relaxation,
+    as precedences model the technological requirements of the production system.
+    We could imagine that scheduling jobs might require preparations,
+    which do not necessarily require the presence of the product about to be processed.
+    Those preparations could therefore be allowed to start even before the predecessor jobs finish executing,
+    which would introduce slack in the constraints%
+    \footnote{
+    Scheduling with so-called \emph{setup times} is a broadly studied subject in the literature.
+    See the survey of \citet{Hartmann2010} where the extension of setup times is briefly described
+    and various examples of approaches to the problem are given.
+    }.
+    However, we can assume that those preparations are completed before the start,
+    or we can assume no preparation time at all.
+
+    \item \emph{Cumulative consumption}
+    The cumulative consumption is dependent on the constructed schedule and the given problem instance.
+    Each job contributes to the cumulative consumption during the time periods it is scheduled.
+    As part of the problem definition, we cannot omit this contribution,
+    nor can it be shortened, as job durations $\duration{j}$ are fixed.
+    Equally, job resource consumptions $\consumption{j}{k}$ influence the cumulative value,
+    but again, due to the nature of our problem,
+    we cannot modify resource consumptions as those are inherent to the problem
+    and the corresponding real-life execution and operation requirements.
+
+    \item \emph{Resource capacities}
+    Available capacities of resources can be modified with reasonable correspondence
+    to modifications of the real-life problem.
+    More specifically, the capacity of a resource during a time period can be increased or decreased.
+    Increasing the capacity of a resource during specific time periods could correspond to increasing
+    the number of workers operating the resource machine,
+    assuming that increasing the number of operating workers increases the total processing capacity.
+    While sole reduction of capacities would not relax the constraints,
+    decreasing the capacity of one resource by a specific amount
+    while increasing the capacity of another resource
+    by the same amount could tighten the constraints on the former resource
+    but relax the constraints on the latter.
+    This decreasing of the capacity of one resource
+    while increasing the capacity of another by the same amount
+    could correspond to migrating workers between the resource machines,
+    assuming that migrations of operating workers are possible.
+\end{enumerate}
+
+We can conclude that the precedence constraints \eqref{csp:precedences} cannot be relaxed.
+On the other hand, the resource capacity constraints \eqref{csp:capacities}
+can be relaxed by modifying the capacities of resources.
+As discussed,
+these modifications can be achieved through capacity additions or migrations,
+both of which have corresponding realizations in real-world production systems.
+
+% -----------------------------------------------------------------------------------------------------------
+\subsection{Resource capacity modifications} \label{subsec:problem-statement/bottlenecks/resource-capacity-modifications}
 
 We will consider \emph{capacity additions} and \emph{capacity migrations} as the possible relaxations
 of scheduling constraints, namely of the constraints \eqref{csp:capacities}.
@@ -220,7 +260,7 @@ Migrations are executed by decreasing the capacity of a selected source resource
 by a specified amount over a specified time interval
 and increasing the capacity of a selected target resource
 by the specified amount over the same time interval.
-Illustrative example of a capacity addition and a capacity migrations is shown in \cref{fig:CapacityChanges}.
+An illustrative example of a capacity addition and a capacity migration is shown in \cref{fig:CapacityChanges}.
 
 \begin{figure}
     \centering
@@ -229,11 +269,12 @@ Illustrative example of a capacity addition and a capacity migrations is shown i
     \label{fig:CapacityChanges}
 \end{figure}
 
-We denote a capacity addition as $\addition{k}{s}{e}{c}$, where
+We associate a capacity addition with the 4-tuple $\addition{k}{s}{e}{c}$, where
 $k$ is the resource whose capacity is increased,
 $s$ and $e$ form the time interval $\intinterval{s}{e}$ over which the addition is executed, and
 $c$ is the added capacity.
-Analogously, we denote a capacity migration as $\migration{k_{\text{from}}}{k_{\text{to}}}{s}{e}{c}$, where
+Analogously, we associate a capacity migration
+with the 4-tuple $\migration{k_{\text{from}}}{k_{\text{to}}}{s}{e}{c}$, where
 $k_{\text{from}}$ is the source resource whose capacity is lowered,
 $k_{\text{to}}$ is the target resource whose capacity is increased,
 $s$ and $e$ form the time interval $\intinterval{s}{e}$ over which the migration is executed, and
@@ -242,7 +283,7 @@ For a modified instance $\Instance^*$, the sets of all migrations and additions 
 $\Migrations^{\Instance^*}$ and $\Additions^{\Instance^*}$, respectively.
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\section{Alternative schedule} \label{sec:problem-statement/alternative-schedule}
+\section{Relaxed schedule} \label{sec:problem-statement/relaxed-schedule}
 
 In the rest of this chapter, we define a general procedure for solving the presented problem,
 identifying bottlenecks and relaxing corresponding constraints by modifying the initial problem,
@@ -253,7 +294,7 @@ More precisely:
 \begin{enumerate}
     \item Suppose we obtained an optimal solution $\Schedule$ to the problem instance $\Instance$.
 
-    \item We select a target order $\targetOrder \in \Orders$ for which to improve tardiness.
+    \item We select the target order $\targetOrder \in \Orders$ for which we want to improve the tardiness.
         We consider improvement to be any non-zero decrease in the objective function with respect to the
         selected order $\targetOrder$ and its tardiness $\tardiness{\targetOrder}$.
 
@@ -262,8 +303,8 @@ More precisely:
     \item Based on the identified bottlenecks, corresponding constraints are relaxed via
         capacity additions and capacity migrations.
         Those capacity changes are captured by modified resource capacity functions
-        $\capacityf{1}^*, \ldots, \capacityf{m}^*$.
-        With these modified capacity functions a modified problem instance $\Instance^*$ is constructed.
+        $\capacityf{1}^*, \ldots, \capacityf{m}^*$
+        corresponding to a modified problem instance $\Instance^*$.
 
     \item We obtain a solution $\Schedule^*$ to the modified problem instance $\Instance^*$.
 
