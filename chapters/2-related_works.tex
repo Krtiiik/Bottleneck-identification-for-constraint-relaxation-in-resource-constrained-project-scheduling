@@ -1,7 +1,7 @@
 \chapter{Related works} \label{chap:related-works}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\section{Scheduling the \acs{rcpsp}} \label{sec:related-works/scheduling-the-rcpsp}
+\section{\acs{rcpsp} scheduling} \label{sec:related-works/scheduling-the-rcpsp}
 
 The \ac{rcpsp} is proven to be NP-hard \citep{Blazewicz1983}.
 A comprehensive overview of complexity results was done by \citet{Ganian2021}.
@@ -10,35 +10,36 @@ To model our studied problem we chose the \Problem{} version of the \ac{rcpsp}.
 \subsection{Time-variable resource capacity constraints} \label{subsec:related-works/scheduling-the-rcpsp/time-variable-resource-capacity-constraints}
 
 Under the general $PSm$ (Project Scheduling) characteristic we allow arbitrary resource capacity functions.
-(However, as stated in \cref{sec:problem-statement/scheduling,sec:problem-statement/bottlenecks,sec:problem-statement/alternative-schedule},
-the resource functions are mostly periodical with only few local modifications.)
+However, as stated in \cref{sec:problem-statement/scheduling,sec:problem-statement/bottlenecks,sec:problem-statement/relaxed-schedule},
+the resource functions are mostly periodical with only a few local modifications.
 
-\citet{Hartmann2010} surveyed the variants of the \ac{rcpsp} studied in literature and alongside other variants also
-discussed time-variable resource capacity constraints.
-(They also published an updated survey \citep{Hartmann2022},
-but since the research in this area had not progressed as much,
-this updated survey only summarizes the findings from the original survey.)
-As in our modeled real-world problem, the surveyed literature used the time-varying capacities to model
-worker shifts, resource machine maintenance, or other manufacturing processes resulting in variable availabilities.
+\citet{Hartmann2010} and \citet{Hartmann2022} surveyed the variants of the \ac{rcpsp} studied in the literature
+and alongside other variants also discussed time-variable resource capacity constraints.
+As in our modeled real-world problem,
+the surveyed literature used the time-varying capacities to model worker shifts,
+resource machine maintenance, or other manufacturing processes resulting in variable availabilities.
 
 Time-variable resource availabilities are often studied with allowed preemption.
-(Recall from \cref{sec:problem-statement/scheduling} that when job preemption is allowed,
-execution of a job can be interrupted and resumed at a later period.)
-Preemption in this context can be a reasonable assumption as it can in some manufacturing processes
-correspond to a simple interruption in executed work.
-On the other hand, job preemption might not be available due to technical reasons.
+Recall from \cref{sec:problem-statement/scheduling} that when job preemption is allowed,
+execution of a job can be interrupted and resumed at a later period.
+Usually, only a specific form of preemption is allowed ---
+interrupting the execution of a job at the end of a working shift
+and resuming it at the start of the following working shift.
+Preemption in this context can be a reasonable assumption as it can,
+in some manufacturing processes, correspond to a simple interruption in executed work.
+On the other hand, job preemption, even in the specific form mentioned,
+might not be available due to technical reasons.
 
-To state a few examples on scheduling under time-variable resource capacity constraints,
+To state a few examples of scheduling under time-variable resource capacity constraints,
 see the work of \citet{Klein2000} or \citet{Nonobe2002}.
-For an example on calendar-based availability scheduling with job preemption, see the work of \citet{Franck2001}.
+For an example of calendar-based availability scheduling with job preemption, see the work of \citet{Franck2001}.
 
 % -----------------------------------------------------------------------------------------------------------
 \subsection{Solution approaches} \label{subsec:related-works/scheduling-the-rcpsp/solution-approaches}
 
 Solving the \ac{rcpsp} is done using exact methods, heuristics, or metaheuristics.
-
 Exact solution methods aim to solve scheduling problems systematically.
-They guarantee finding the optimal solution by exhaustively exploring all possible solutions
+They guarantee to find the optimal solution by exhaustively exploring all possible solutions
 within a problem's feasible solution space.
 However, this exhaustive search can become computationally expensive
 and impractical for large-scale or complex problem instances.
@@ -51,8 +52,8 @@ with generalized precedence relations can be found in the work of \citet{Schnell
 
 In contrast, heuristics aim to quickly find good solutions but do not guarantee optimality.
 Heuristic approaches are simple, easy to implement, and computationally inexpensive compared to exact methods.
-Heuristics use priority scheduling rules, schedule-generating schemes, approximations,
-but also relaxations of exact methods (such as truncated branch-and-bound or relaxed integer-programming).
+Heuristics use priority scheduling rules, schedule-generating schemes, and approximations,
+but also relaxations of exact methods, such as truncated branch-and-bound or relaxed integer programming.
 Simple heuristics were popular as alternatives to exact methods.
 See the survey of \citet{Kolisch1999} for an extensive survey of heuristic approaches used at the time.
 
@@ -60,32 +61,41 @@ Metaheuristics are higher-level problem-solving frameworks that search for good 
 in the solution space using a combination of exploration and exploitation strategies.
 Like simple heuristics, metaheuristics do not guarantee finding the optimal solution
 but offer a trade-off of computational performance.
-They are often more complex than simple heuristics, as a result computationally more expensive,
+They are often more complex than simple heuristics and, as a result computationally more expensive,
 but they can handle larger and more complex problem instances.
 Metaheuristics include genetic algorithms, simulated annealing, tabu search, and particle swarm optimization.
 A recent survey on metaheuristics by \citet{Pellerin2020} compares a wide range of metaheuristics
 on PSPLIB instances.
 
+We chose an exact solution approach by utilizing a constraint programming solver.
+Our problem contains many constraints, most of which model time-variable capacities of resources.
+We frequently modify those constraints and, therefore, need to make adjustments to the model.
+Constraint programming models and solvers are ideal for such use cases.
+The constraints can be expressed in a declarative way without having to handle specifics.
+This makes the process of adjusting the declared constraints and obtaining modified models straightforward.
+In comparison, modeling these problems for heuristics or metaheuristics requires significantly more effort,
+and adjusting the modeled constraints might prove even more difficult.
+
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Bottlenecks in scheduling} \label{sec:related-works/bottlenecks-in-scheduling}
 
-Bottlenecks are broadly studied in scheduling literature.
+Bottlenecks are broadly studied in the scheduling literature.
 The notion of a bottleneck is recognized to have an important role in scheduling when system performance is considered.
 
 % -----------------------------------------------------------------------------------------------------------
 \subsection{Various definitions} \label{subsec:related-works/bottlenecks-in-scheduling/various-definitions}
 
 In \Cref{def:bottleneck} we defined the \acf{ebm}.
-We choose this definition as it best corresponds to our studied problem.
+We chose this definition as it best corresponds to our studied problem.
 Namely, it emphasizes the execution phase of production within which the bottleneck is considered
 and doesn't specify any particular metric or measure of the bottleneck's impact on the system.
 
 \citet{Betterton2012} surveyed the literature on scheduling bottlenecks and found
 at least 11 different definitions of the term \emph{bottleneck resource}.
-First attempts at defining the term were very specific in the way the bottleneck resource is identified.
+The first attempts at defining the term were very specific in the way the bottleneck resource is identified.
 Usually, the definition corresponded closely with the identification method proposed in the same work.
 See for example the work of \citet{Lawrence1994}, \citet{Kuo1996}, or \citet{Roser2001}.
-Throughout the years however, the aim shifted towards defining a bottleneck as generally as possible
+Throughout the years, however, the aim shifted towards defining a bottleneck as generally as possible
 to cover as many specific interpretations of the term
 but to also best capture the important nature of a bottleneck resource in production systems.
 For attempts at this approach see the work of \citet{Chiang2001} or \citet{Biller2010}.
@@ -93,16 +103,16 @@ For attempts at this approach see the work of \citet{Chiang2001} or \citet{Bille
 Based on the definitions presented up to that point,
 \citet{Betterton2012} stated the following definition.
 
-\begin{defn*}[Bottleneck resource \citep{Betterton2012}] \label{def:bottleneck-general}
+\begin{defn}[Bottleneck resource \citep{Betterton2012}] \label{def:bottleneck-general}
     The \emph{bottleneck} is the resource that affects the performance of a system in the strongest manner, that is,
     the resource that, for a given differential increment of change, has the largest influence on system performance.
-\end{defn*}
+\end{defn}
 
 This definition provides a neat generalization of the term \emph{bottleneck resource}.
-It also provides the insight that focusing on such resource and making small adjustments
-can significantly influence the system performance.
-(Note, that the definition doesn't specify the influence of mentioned adjustments has to be beneficial towards the performance.
-Correctly identifying the bottleneck resource, but incorrectly adjusting the related settings can impact the performance negatively.)
+It also provides insight that focusing on such resources and making small adjustments
+can significantly influence the system's performance.
+Note, that the definition does not specify the influence of mentioned adjustments has to be beneficial towards the performance.
+Correctly identifying the bottleneck resource, but incorrectly adjusting the related settings can impact the performance negatively.
 
 % -----------------------------------------------------------------------------------------------------------
 \subsection{Bottleneck classification} \label{subsec:related-works/bottlenecks-in-scheduling/bottleneck-classification}
@@ -112,18 +122,18 @@ We use the bottleneck classification proposed by \citet{Wang2016}.
 This classification distinguishes between structural, planning, and execution bottlenecks
 based on the time frame at which the bottlenecks are identified.
 
-\emph{Structural bottleneck machines} frequently impede the performance of the production system,
+\emph{Structural bottleneck machines} frequently affect the performance of the production system,
 regardless of the specific problem setting.
-Such machines are usually identifiable by operators,
+Such machines are usually identifiable by human operators,
 as their high impact on performance can be observed across different problem settings and schedules.
-In contrast to their identifiability, structural bottlenecks might not be easily solvable or relaxed.
+In contrast to their identifiability by humans, structural bottlenecks might not be easily solvable or relaxed.
 It may be caused by a hard limitation of the system,
-for example an inefficient production line layout or
+for example, an inefficient production line layout or
 machines running at full capacity without the possibility of increasing the capacity.
 
 Structural bottlenecks can be identified with the use of historical production data.
-Modern production system collect large volumes of data concerning the production,
-performance of individual components, utilization of resources etc.
+Modern production systems collect large volumes of data concerning the production,
+performance of individual components, utilization of resources, etc.
 This data is then processed by techniques from data science or machine learning
 to capture various patterns in production, anomalies, or correlations among the data
 indicating a potential bottleneck.
@@ -133,8 +143,8 @@ A recent survey by \citet{Subramaniyan2021} provides an overview of data-driven 
 To state a few examples, see the work of \citet{Subramaniyan2016}, \citet{Roh2018} or \citet{Li2009}.
 
 When historical data is not available,
-a simulation of the system might provide sufficient approximation of the real production.
-Such approach was studied by \citet{Roser2001} where the study focused on a serial production line
+a simulation of the system might provide a sufficient approximation of the real production.
+Such an approach was studied by \citet{Roser2001} where the study focused on a serial production line
 and the bottleneck machine was identified through the average active duration of machines.
 \citet{Zhang2008a} and \citet{Zhang2012} first model an alternative relaxed optimization model for the system,
 identify the bottleneck machines during the scheduling of this model,
@@ -145,8 +155,8 @@ which utilizes the obtained bottleneck information by allocating more resources 
 Identifying such machines during the scheduling process can help guide the scheduling procedure
 --- whether exact, heuristic, or metaheuristic.
 The scheduling procedure can choose to allocate more resources to the identified bottleneck machine,
-spend more time and computational resources on scheduling jobs on such machine, etc.
-Notable example of such approach is the shifting bottleneck procedure proposed by \citet{Adams1988}.
+spend more time and computational resources on scheduling jobs on such machines, etc.
+A notable example of such an approach is the shifting bottleneck procedure proposed by \citet{Adams1988}.
 They construct the schedule by sequentially scheduling on singular machines,
 each time choosing an unscheduled machine identified as the current bottleneck,
 then locally reoptimizing the already scheduled machines.
@@ -159,9 +169,9 @@ In a Job-Shop scheduling problem,
 They incorporate this identification in a proposed genetic algorithm to guide its search for improved solutions.
 
 \emph{Execution bottleneck machines} are the focus of study in this thesis.
-These bottlenecks are considered in the constructed schedule for a given problem
-and restrain us from achieving a better schedule in terms of the given optimization goal
-(such as average throughput, schedule makespan, weighted tardiness, etc.).
+These bottlenecks are considered in the constructed schedule for a given problem instance
+and restrain us from achieving a better schedule in terms of the given optimization goal,
+such as average throughput, schedule makespan, weighted tardiness, etc.
 While identifying structural bottlenecks primarily aims to enhance the overall system performance,
 identifying execution bottlenecks aims to improve performance for specific problem instances.
 It's worth noting that for a specific problem instance and its constructed schedule,
@@ -170,7 +180,7 @@ but for a different problem instance with different settings,
 the execution bottleneck may vary.
 Consequently, relaxing constraints related to an identified execution bottleneck
 aims to enhance performance for the specific problem instance;
-however, applying such relaxation to a different problem instance might even worsen performance.
+however, applying such relaxation to a different problem instance might not provide any improvement.
 
 Limited studies have focused on this type of bottleneck.
 \citet{Wang2016} proposed a multi-indicator approach for identifying execution bottlenecks.
@@ -186,8 +196,8 @@ Various techniques are used for the identification of bottleneck machines.
 Such techniques typically involve the usage of identification indicators,
 either individually or in combination.
 An identification indicator refers to a value computed for each machine,
-allowing us to rank the machines and then to select the bottleneck machine based on this rank.
-We will state a few examples.
+allowing us to rank the machines and then select the bottleneck machine based on this rank.
+We will state a few examples proposed in the literature:
 
 \begin{itemize}
     \item \acf{mur} \citep{Lawrence1994}:
@@ -221,13 +231,12 @@ We will state a few examples.
                    = \frac{\sum_{j \in \JobsOnResource{k}} \consumption{j}{k}}%
                           {R_{k} \cdot |\JobsOnResource{k}|},
         \end{align*}
-        where $R_{k}$ is the per-period capacity of a resource $k$
-        --- these indicators do not account for variable resource capacities.
-        
+        where $R_{k}$ is the per-period capacity of a resource $k$ ---
+        these indicators do not account for variable resource capacities.
         Those indicators are usually considered when describing problem instances,
         specifically, the properties of resources.
         However, \citet{Luo2023} chose them as bottleneck identifiers
-        and compared their effectiveness when used to guide a genetic-programming algorithm.
+        and compared their effectiveness when used to guide a genetic programming algorithm.
 \end{itemize}
 
 In the formulae for $\indMUR{k}$ and $\indRC{k}$,
@@ -235,19 +244,13 @@ $\JobsOnResource{k} \defeq \{j \in \Jobs : \consumption{j}{k} > 0\}$
 is the set of jobs with nonzero consumption of the resource $k$,
 i.e. the jobs which are executed on the resource $k$.
 
-To the best our knowledge, there exist no identification identifiers for the \ac{rcpsp}
-with time-variable resource capacities.
-Moreover, we were unable to find any identification identifiers for the standard \ac{rcpsp}
-which would account for time-variable consumption profiles in a schedule.
-
-Although the indicators mentioned can in theory be used in the \ac{rcpsp},
-they were originally designed for Job-Shop problems.
-Identification indicators in the \ac{rcpsp} could incorporate information about
-variable resource loads and even
-variable capacity functions in the time-variant capacities extension.
-However, the indicators designed for Job-Shop problems do not consider
-this additional dimension of information.
-We will address this further in \fullref{sec:solution-apporach/baseline-solution}.
+Identification indicators have the advantage of being simple,
+making their implementation straightforward and their computation efficient.
+However, more complex identification methods may provide better insights
+into the bottleneck identification process.
+Nevertheless, these methods are usually tailored specifically to the problem being studied,
+require specific settings and assumptions,
+or their implementation can be too complicated for practical use.
 
 % -----------------------------------------------------------------------------------------------------------
 \subsection{Bottlenecks in the \acs{rcpsp}} \label{subsec:related-works/bottlenecks-in-scheduling/bottlenecks-in-the-rcpsp}
@@ -258,29 +261,42 @@ i.e. scheduling on unit-capacity resources.
 
 \citet{Luo2023} studied how identifying bottleneck machines can guide the scheduling
 process of a genetic algorithm.
-\citet{Arkhipov2017} conducted a case study on a large-scale
-(over $3.5$ thousand operations and over $50$ machines)
-resource-constrained scheduling problem.
+\citet{Arkhipov2017} conducted a case study on a large-scale resource-constrained scheduling problem
+with over 3 thousand operations and over 50 machines.
 To address this problem, they proposed a heuristic approach for estimating project makespan
 and resource load profiles.
 Those estimations are in turn used to identify bottleneck resources for the problem.
 However, the identified bottleneck resources were not addressed further.
 
+Concerning bottleneck identification indicators discussed above,
+we were unable to find any for the \ac{rcpsp} with time-variable resource capacities.
+Moreover, we were unable to find any identification identifiers for the standard \ac{rcpsp}
+which would account for time-variable consumption profiles in a schedule.
+Although the indicators mentioned in \cref{subsec:related-works/bottlenecks-in-scheduling/identification-indicators}
+can in theory be used in the \ac{rcpsp},
+they were originally designed for the Job-Shop problem.
+Identification indicators in the \ac{rcpsp} could incorporate information about
+variable resource loads and even
+variable capacity functions in the time-variant capacities extension.
+However, the indicators designed for the Job-Shop problem do not consider
+this additional dimension of information.
+We address this further in \cref{sec:solution-apporach/baseline-solution}.
+
 % -----------------------------------------------------------------------------------------------------------
-\subsection{Relaxing bottlenecks} \label{subsec:related-works/bottlenecks-in-scheduling/relaxing-bottlenecks}
+\subsection{Relaxing the identified bottlenecks} \label{subsec:related-works/bottlenecks-in-scheduling/relaxing-bottlenecks}
 
 In their study, \citet{Zhang2012} addressed the Job-Shop problem by relaxing its capacity constraints
 and then solving the modified relaxed problem to identify bottlenecks based on the solution.
-The obtained information was used to guide a proposed simulated-annealing
+The obtained information was used to guide a proposed simulated annealing
 algorithm to find a solution to the original problem.
-Thus, the relaxation served only as an intermediate step towards obtaining a solution,
+Thus, the relaxation served only as an intermediate step toward obtaining a solution,
 rather than being the desired result.
 
 \citet{Lawrence1994} studied how identified bottlenecks shift between machines
 in response to introducing relaxations to the original problem.
 They employed a proposed "bottleneck chasing" policy for relaxing short-run bottlenecks,
-wherein the capacity of the identified bottleneck resource is increased
-(e.g., by extending its working shifts, assigning additional employees).
+wherein the capacity of the identified bottleneck resource is increased,
+e.g., by extending its working shifts, or assigning additional employees.
 Then, the bottleneck identification process is run again to examine
 whether the bottlenecks shift to a different resource.
 The sensitivity of bottleneck shifting to the introduced relaxations was also studied.
@@ -298,8 +314,8 @@ resources.
 \todo{Revision}
 
 As discussed in \cref{subsec:related-works/bottlenecks-in-scheduling/identification-indicators,subsec:related-works/bottlenecks-in-scheduling/bottlenecks-in-the-rcpsp},
-scheduling literature primarily focuses on bottlenecks in the Job-Shop problem.
+the scheduling literature primarily focuses on bottlenecks in the Job-Shop problem.
 We aim to extend the standard Job-Shop approaches to the \ac{rcpsp}.
 Our second goal is to design an approach for identifying bottlenecks in the \ac{rcpsp}
 extended with time-variant resource capacities
-with the focus on relaxing the identified bottlenecks in order to improve a proposed schedule.
+with the focus on relaxing the identified bottlenecks to improve a proposed schedule.

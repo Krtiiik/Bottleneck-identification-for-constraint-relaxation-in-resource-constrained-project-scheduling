@@ -122,6 +122,12 @@
 \crefname{stepsi}{step}{steps}
 \Crefname{stepsi}{Step}{Steps}
 
+% Custom referencable "conditions" enumerate
+\newlist{conditions}{enumerate}{10}
+\setlist[conditions]{label=\roman*)}
+\crefname{conditionsi}{condition}{conditions}
+\Crefname{conditionsi}{Condition}{Conditions}
+
 % Tables stuff
 \newcommand{\tablenote}[2]{\multicolumn{#1}{p{0.95\textwidth}}{\footnotesize \emph{Note:} #2}}
 \newcommand{\cellrule}{\leavevmode%
@@ -215,6 +221,7 @@
 \newcommand{\tardiness}[1]{T_{#1}}
 
 \newcommand{\targetOrder}{o}
+\newcommand{\closure}[1]{\mathcal{L}(#1)}
 
 \newcommand{\migration}[5]{(#1, #2, #3, #4, #5)}
 \newcommand{\Migrations}{\mathcal{M}}
@@ -248,3 +255,17 @@
 \newcommand{\algGranularity}{\mathrm{G}}
 \newcommand{\algMaxperiods}{P_{\max}}
 \newcommand{\algImprovement}{\Delta}
+\newcommand{\algMaxintervals}{IT_{\max}}
+\newcommand{\algSortkey}{\mathcal{K}}
+
+\newcommand{\convPre}{f_{\text{pre}}}
+\newcommand{\convAround}{f_{\text{around}}}
+\newcommand{\convPost}{f_{\text{post}}}
+
+\newcommand{\costMigration}{\mathcal{C}_{\Migrations}}
+\newcommand{\costAddition}{\mathcal{C}_{\Additions}}
+\newcommand{\mean}[1]{\overline{#1}}
+\newcommand{\kpiImprovement}{\Delta\tardiness{\targetOrder}}
+\newcommand{\kpiCost}{\operatorname{cost}}
+\newcommand{\kpiDiff}{\Delta\jobstart{}}
+\newcommand{\kpiDuration}{\operatorname{time}}

@@ -40,14 +40,16 @@
 \end{alg}
 
 
-\begin{alg}{Function}{ReduceCapacityChanges}{$k$, $\capacityf{\text{orig}}$, $\Instance$, $\Schedule$} \label{alg:reduce-capacity-changes}
-\State $\capacityf{}^\prime: \intinterval{1}{\horizon} \to \Nzero$
-       \Comment Reduced capacity function
-\State $L \gets $ \Call{ResourceLoad}{$k$, $\Instance$, $\Schedule$}
-\For {$t \in \intinterval{1}{\horizon}$}
-    \State $\capacity{}{t}^\prime \gets \max(\capacity{\text{orig}}{t}, L(t))$
+\begin{alg}{Function}{ReduceCapacityChanges}{$\Instance$, $\Schedule$, $\capacityf{1}^\text{orig}$, \dots, $\capacityf{m}^\text{orig}$} \label{alg:reduce-capacity-changes}
+\State $\capacityf{1}^\prime, \dots, \capacityf{m}^\prime: \intinterval{1}{\horizon} \to \Nzero$
+       \Comment Reduced capacity functions
+\For {$k \in \Resources$}
+    \State $L \gets $ \Call{ResourceLoad}{$k$, $\Instance$, $\Schedule$}
+    \For {$t \in \intinterval{1}{\horizon}$}
+        \State $\capacity{k}{t}^\prime \gets \max(\capacity{k}{t}^{\text{orig}}, L(t))$
+    \EndFor
 \EndFor
-\State \Return $\capacityf{}^\prime$
+\State \Return $\capacityf{1}^\prime, \dots, \capacityf{m}^\prime$
 \end{alg}
 
 
@@ -61,8 +63,76 @@
 \end{alg}
 
 
-\begin{alg}{Function}{FindAdditionsAndMigrations}{...} \label{alg:find-additions-and-migrations}
-\State TODo
+\todo{FindAdditionsAndMigrations}
+\begin{alg}{Function}{FindAdditionsAndMigrations}{$\capacityf{k}$, $\Instance$, $\Schedule$} \label{alg:find-additions-and-migrations}
+\State REQ $\gets$ set of all capacity addition requirements
+\State 
 \end{alg}
+
+
+\begin{alg}{Function}{ModifyResourceCapacities}{$\Instance$, $\chi_1$, \dots, $\chi_c$} \label{alg:modify-resource-capacities}
+\State $\capacityf{1}^*, \dots, \capacityf{m}^* \gets \capacityf{1}, \dots, \capacityf{m}$
+    \Comment Copy the original capacity functions
+\For {$(j, s, e) \in \{ \chi_1, \dots, \chi_c \}$}
+    \For {$k \in \Resources : \consumption{j}{k} > 0 $}
+        \For {$t \in \intinterval{s}{e-1}$}
+            \State $\capacity{k}{t}^* \gets \capacity{k}{t}^* + \consumption{j}{k}$
+        \EndFor
+    \EndFor
+\EndFor
+\State \Return $\capacityf{1}^*, \ldots, \capacityf{m}^*$
+\end{alg}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section{Full instance plots} \label{sec:attachments/full-instance-plots}
+
+\begin{figure}
+    \centering
+    \includegraphics[angle=270, width=\textwidth]{img/exp_cost_improv.pdf}
+    \caption{
+        Capacity changes cost (x-axis) to achieved 
+        improvement (y-axis) for every experiment instance.
+        }
+    \label{fig:exp-full/cost-improv}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[angle=270,width=\textwidth]{img/exp_improv_diff.pdf}
+    \caption{
+        Achieved improvement (x-axis) to schedule
+        difference (y-axis) for every experiment instance.
+        }
+    \label{fig:exp-full/improv-diff}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[angle=270,width=\textwidth]{img/exp_duration_improv.pdf}
+    \caption{
+        Evaluation duration (x-axis) to achieved
+        improvement (y-axis) for every experiment instance.
+        }
+    \label{fig:exp-full/duration-improv}
+\end{figure}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section{Documentation} \label{sec:attachments/documentation}
+
+\begin{small}
+\begin{verbatim}
+usage: experiments.py [--aggregate] [--scale] [--save_plots]
+                      [--addition ADDITION] [--migration MIGRATION]
+                                                                                                               
+options:                                                                                                       
+  --aggregate            Determines whether to aggregate
+                         instances by type                                      
+  --scale                Determines whether to scale
+                         evaluations KPIs                                           
+  --save_plots           Determines whether to save plots to files                                              
+  --addition ADDITION    Cost of capacity addition                                                              
+  --migration MIGRATION  Cost of capacity migration
+\end{verbatim}
+\end{small}
 
 

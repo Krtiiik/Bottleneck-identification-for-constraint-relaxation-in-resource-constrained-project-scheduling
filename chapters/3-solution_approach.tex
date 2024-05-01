@@ -1,36 +1,52 @@
 \chapter{Solution approach} \label{chap:solution-apporach}
 
-\todo{%
-We design two algorithms to identify and relax bottlenecks in the \ac{rcpsp}.
-The first algorithm utilizes identification indicators to identify bottleneck machines
-and by processing the machine load function,
-periods for potential resource capacity relaxations are found.
-For this purpose, we adapt existing Job-Shop bottleneck identification indicators
-for the use in the \ac{rcpsp}.
-The second algorithm generates partial solutions by considering time-variable relaxations
-and proposes relaxations to the original problem based on solutions to the relaxed problems.
-}
+In this chapter,
+we present two algorithms designed for identifying and relaxing bottlenecks in the \ac{rcpsp}.
+Both algorithms aim to improve the tardiness of a selected order
+by introducing relaxations to the capacity constraints in the problem instance
+and finding a solution to the modified problem instance.
+First, we propose an algorithm called \acf{iira}.
+The \ac{iira} combines an adaptation of existing bottleneck identification approaches from the literature
+with a new method for relaxing the capacity constraints.
+The algorithm utilizes bottleneck identification indicators to find bottleneck resources,
+selects periods with high improvement potential,
+and increases the capacities of the bottleneck resources during the selected periods.
+The second algorithm we propose is the \acf{ssira}.
+The \ac{ssira} employs a novel approach to relaxing capacity constraints
+based on finding improvement intervals in partially relaxed versions of the problem.
+\ac{ssira} iteratively relaxes the capacity constraints in suffixes of an obtained schedule
+and selects jobs that could start earlier following the relaxation.
+The resource capacity constraints are then relaxed with respect to a small subset
+of the selected jobs with improvement potential.
+
+\todo{running example for the algorithms}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Baseline solution} \label{sec:solution-apporach/baseline-solution}
 
-\todo{Intro}
+In this section, we propose adaptations of existing bottleneck identification indicators from the literature.
+Utilizing the adapted indicators, we propose the \ac{iira}
+for relaxing capacity constraints of a given problem instance based on its solution.
 
 % -----------------------------------------------------------------------------------------------------------
 \subsection{Adapted identification indicators}
 
 We adapt existing identification indicators to detect bottlenecks,
 specifically the \acf{mur} and \acf{auad} indicators.
-(For definitions, see \cref{subsec:related-works/bottlenecks-in-scheduling/identification-indicators}.)
+For precise definitions, see \cref{subsec:related-works/bottlenecks-in-scheduling/identification-indicators}.
         
 The \ac{mur}, first utilized as a bottleneck identification indicator by \citet{Lawrence1994},
 considers the ratio of executed work on a resource to the total time the resource was used.
-Despite its simplicity, the \ac{mur} indicator has proven effective at identifying long-run bottlenecks.
-(Long-run bottlenecks could be viewed as structural bottlenecks ---
-see \cref{subsec:related-works/bottlenecks-in-scheduling/bottleneck-classification} for bottleneck classification).
+In their study, \citet{Lawrence1994} demonstrate, that despite its simplicity,
+the \ac{mur} indicator is effective at identifying long-run bottlenecks%
+\footnote{
+Long-run bottlenecks could be viewed as structural bottlenecks ---
+see \cref{subsec:related-works/bottlenecks-in-scheduling/bottleneck-classification} for bottleneck classification.
+}.
+
 
 The \ac{auad}, initially proposed by \citet{Roser2001},
-is slightly more complex but remains a comprehensive indicator for identifying bottleneck resources.
+is more complex but remains a comprehensive indicator for identifying bottleneck resources.
 For the specified resource, the sequence of all uninterrupted execution periods is computed
 and the average length of those periods is considered the indicator value.
 An uninterrupted period is a sequence of jobs scheduled consecutively with no idle times between them.
@@ -43,19 +59,19 @@ In a Job-Shop scheduling problem,
 this represents all the available information.
 This concept remains applicable in the \ac{rcpsp}.
 However, due to the variability of machine load over time in the \ac{rcpsp},
-a binary \enquote{processing-idle} differentiation between machine states
+a binary \enquote{processing--idle} differentiation between machine states
 does not provide a sufficient machine-load indication.
 In the \ac{rcpsp}, we have additional information available.
 By incorporating resource capacities and resource consumptions into the calculation,
 we can achieve a more precise result that better corresponds to the actual machine load.
 \cref{fig:MachineLoad} illustrates the difference in variability of the load between
-a Job-Shop machine (subfigure \ref{fig:MachineLoad:JS})
-and a \ac{rcpsp} machine (subfigure \ref{fig:MachineLoad:RCPSP}).
+a Job-Shop machine (\cref{fig:MachineLoad:JS})
+and a \ac{rcpsp} machine (\cref{fig:MachineLoad:RCPSP}).
 
 \begin{figure}[t]
     \centering
     
-    \subfloat[Job Shop]{\includegraphics[width=0.7\textwidth]{img/Capacities-JobShop.pdf}\label{fig:MachineLoad:JS}}
+    \subfloat[Job-Shop scheduling problem]{\includegraphics[width=0.7\textwidth]{img/Capacities-JobShop.pdf}\label{fig:MachineLoad:JS}}
     \\
     \subfloat[RCPSP]{\includegraphics[width=0.7\textwidth]{img/Capacities-RCPSP.pdf}\label{fig:MachineLoad:RCPSP}}
     
@@ -75,7 +91,7 @@ $$
                         {\sum_{t=1}^{C_{\max}} \capacity{k}{t}},
 $$
 where $C_{\max} \defeq \max_{j \in \Jobs} \jobend{j}$%
-\footnote{In scheduling literature,
+\footnote{In the scheduling literature,
 $C_{\max}$ is referred to as the \emph{makespan} of the project.
 Minimizing project makespan is a common optimization goal in scheduling,
 and it is a simpler alternative to the total weighted tardiness we use.}.
@@ -96,7 +112,6 @@ $(a_{k1}^{S}, a_{k1}^{E}), \dots, (a_{kA_k}^{S}, a_{kA_k}^{E})$
 is the the sequence of \emph{uninterrupted active periods},
 where $a_{ki}^{S} \in \intinterval{1}{\horizon}$ denotes the start of the period $i$
 and $a_{ki}^{E} \in \intinterval{1}{\horizon}$ denotes the end of the period $i$.
-\toask{% JE TOTO ROZUMNÁ DEFINICE?
 Similar to the definition of \ac{auad} but with differences induced by non-unit capacities,
 an uninterrupted active period is a maximal set (maximal in terms of inclusion)
 of jobs scheduled consecutively or in parallel with no idle time
@@ -106,35 +121,35 @@ the execution intervals of the jobs overlap
 or the considered resource is not idle between the execution intervals of the jobs.
 The sequence of uninterrupted active periods of a resource is the transitive closure of this relation
 on jobs executed on the resource.
-}
 Here, as opposed to the \ac{auad},
-we consider not the duration of the periods,
+we do not consider the duration of the periods,
 but the individual jobs executed during each of the periods,
 specifically their durations and consumptions of the evaluated resource.
 
 In the formula for $\indPRU{k}{i}$,
 $\JobsOnResourceInPeriod{k}{i} \defeq \{ j \in \JobsOnResource{k} : a_{ki}^{S} \leq \jobstart{j} \leq a_{ki}^{E} \}$
 is the set of jobs executed on resource $k$ during the uninterrupted active period $i$.
-(Recall from \cref{subsec:related-works/bottlenecks-in-scheduling/identification-indicators} that
-$\JobsOnResource{k} = \{ j \in \Jobs : \consumption{j}{k} > 0 \}$.)
+Recall from \cref{subsec:related-works/bottlenecks-in-scheduling/identification-indicators} that
+$\JobsOnResource{k} = \{ j \in \Jobs : \consumption{j}{k} > 0 \}$.
 
 Having proposed bottleneck identification indicators for our \ac{rcpsp} variant,
 we will formulate an algorithm utilizing those indicators in the following section.
 
 % -----------------------------------------------------------------------------------------------------------
-\subsection{Identification indicator-based relaxing algorithm}
+\subsection{Identification Indicator-based Relaxing Algorithm} \label{subsec:solution-approach/baseline-solution/iira}
 
 In this section, we formulate the \acf{iira}.
 \ac{iira} employs a specified bottleneck identification indicator to identify bottleneck resources.
-It calculates the granular resource load
-and uses convolution to determine the improvement potential for granular periods.
+It calculates the granular resource load function
+and uses its convolution with a suitably chosen kernel function
+to determine the improvement potential for granular periods.
 Finally, it relaxes capacity constraints in granular periods with the greatest improvement potential.
 Following this, a solution is obtained for the relaxed problem instance,
 and the proposed capacity relaxations are reduced to only include those utilized by the new solution.
-We will now formulate the algorithm in \cref{alg:identification-indicator-relaxing-algorithm}.
+The \acf{iira} is given in \cref{alg:identification-indicator-relaxing-algorithm}.
 
 \begin{algorithm}[t]
-\caption{\acl{iira}}
+\caption{\acf{iira}}
 \label{alg:identification-indicator-relaxing-algorithm}
 \begin{algorithmic}[1]
 
@@ -148,45 +163,100 @@ We will now formulate the algorithm in \cref{alg:identification-indicator-relaxi
 \State $\Instance^* \gets \Instance$, $\Schedule^* \gets \Schedule$
        \Comment Modified instance and its solution, initially
        \Statecr copies of the original instance and solution
-\Repeat
+\Repeat \label{alg:iira/repeat}
     \State Evaluate $\Schedule^*$ using $\algIndicator$, obtaining:
-           $\algIndicator_k \;\forall k \in \Resources$
+           $\algIndicator_k \;\forall k \in \Resources$ \label{alg:iira/evaluation}
     \State Identify bottleneck resource:
-           $k^* \gets \argmax_k \algIndicator_k$
-    \State Compute granular resource load for $k^*$:
+           $k^* \gets \argmax_k \algIndicator_k$ \label{alg:iira/identification}
+    \State Compute granular resource load for $k^*$: \label{alg:iira/granular-load}
     \Statec{3} $\resourceLoad{k^*} \gets $ \Callref{GranularResourceLoad}%
                                                    {$k^*$, $\Instance^*$, $\Schedule^*$, $PC$}%
                                                    {alg:granular-resource-load}
-    \State Compute improvement potential of periods: $\Psi \gets \resourceLoad{k^*} * \algConvolution$
-    \State Find improvement periods:
+    \State Compute improvement potential of periods: $\Psi \gets \resourceLoad{k^*} * \algConvolution$ \label{alg:iira/convolution}
+    \State Find improvement periods: \label{alg:iira/periods}
     \Statec{3} $p_1, \dots, p_{\algMaxperiods} \gets$
             periods with the highest potential $\Psi(i)$
-    \For {$i \gets p_1, \dots, p_{\algMaxperiods}$}
+    \For {$i \in \{p_1, \dots, p_{\algMaxperiods}\}$}
         \State $\capacityf{k^*}^* \gets$ \Callref{IncreaseGranularPeriodCapacity}%
                                                  {$i$, $\capacityf{k^*}^*$, $\algGranularity$, $\algImprovement$}%
-                                                 {alg:increase-granular-period-capacity}
+                                                 {alg:increase-granular-period-capacity} \label{alg:iira/capacity-increase}
     \EndFor
-    \State Find solution $\Schedule^*$ to the modified instance $\Instance^*$
-    \State $\capacityf{k^*}^* \gets$ \Callref{ReduceCapacityChanges}%
-                                             {$k$, $\capacityf{k^*}$, $\Instance^*$, $\Schedule^*$}%
-                                             {alg:reduce-capacity-changes}
+    \State Find solution $\Schedule^*$ to the modified instance $\Instance^*$ \label{alg:iira/modified-solution}
+    \State $\capacityf{1}^*, \dots, \capacityf{m}^* \gets$ \Callref{ReduceCapacityChanges}%
+                                                                   {$\Instance^*$, $\Schedule^*$, $\capacityf{1},$ \dots, $\capacityf{m}$}%
+                                                                   {alg:reduce-capacity-changes} \label{alg:iira/reduction}
     \State $\Additions^{\Instance^*}, \Migrations^{\Instance^*} \gets $
            \Callref{FindAdditionsAndMigrations}%
-                   {$\capacityf{k^*}^*$, $\Instance^*$, $\Schedule^*$}%
-                   {alg:find-additions-and-migrations}
-\ForIter{$\algMaxiter$}
+                   {$\Instance^*$, $\Schedule^*$}%
+                   {alg:find-additions-and-migrations} \label{alg:iira/additions-migrations}
+\ForIter{$\algMaxiter$} \label{alg:iira/for-iters}
 
-\Output Modified instance $\Instance$ and its solution $\Schedule^*$
-
+\Output  Modified instance $\Instance^*$ and its solution $\Schedule^*$,
+\Outputc additions $\Additions^{\Instance^*}$, migrations $\Migrations^{\Instance^*}$
+\Statex
 \Note In the call to \Call{ReduceCapacityChanges}{} (statement 12),
       $\capacityf{k^*}$ from the~original instance is given as the original capacity function of the resource $k^*$.
+
 \end{algorithmic}
 \end{algorithm}
 
-The algorithm statement contains the use of multiple utility functions and procedures.
-To maintain brevity,
-we exclude the detailed specifics of the procedures and instead offer a short overview of each procedure.
-Complete statements of the procedures are available in \cref{sec:attachments/algorithms-functions-procedures}.
+The algorithm consists of a main loop (lines~\ref{alg:iira/repeat}--\ref{alg:iira/for-iters}),
+the input of which is a problem instance and its solution,
+the output of which is a modified problem instance and its solution.
+In each iteration of the main loop, the following steps are executed:
+\begin{steps}
+    \item
+    First, the solution is evaluated using the given identification indicator
+    and the bottleneck resource is identified by its maximal value of the identification indicator
+    (lines~\ref{alg:iira/evaluation} and~\ref{alg:iira/identification}).
+
+    \item
+    The granular load of the bottleneck resource is computed
+    and the improvement potentials for granular periods are computed
+    using convolution (lines~\ref{alg:iira/granular-load} and~\ref{alg:iira/convolution}).
+    The granular load of a resource indicates how the resource is being utilized during granular periods.
+    High utilization could indicate a potential bottleneck.
+    However, it is uncertain whether the bottleneck occurs in the highly-utilized granular period,
+    or whether the high utilization is a consequence of a bottleneck
+    in a preceding or following granular period.
+    This is why the granular load is convolved with a kernel function of choice,
+    which propagates the information about high resource utilization
+    to consecutive granular periods. \label{alg/iira-steps/identification}
+
+    \item
+    A small subset of granular periods is selected for the increase in capacity.
+    The granular periods with the highest improvement potentials are chosen (line~\ref{alg:iira/periods}).
+    The capacity of the bottleneck resource is increased during the selected granular periods
+    by a specified amount (line~\ref{alg:iira/capacity-increase}).
+    The modified resource capacity function of the bottleneck resources forms,
+    together with the unchanged capacity functions of other resources,
+    a new modified problem instance.
+    Note that the algorithm does not consider the target order~$\targetOrder$ in any way
+    when identifying bottlenecks (\cref{alg/iira-steps/identification})
+    nor when selecting granular periods for capacity constraints relaxation.
+
+    \item
+    Finally, a new solution to the modified problem instance is found (line~\ref{alg:iira/modified-solution}).
+    Based on this solution,
+    reduced capacity functions are computed to exclude capacity relaxations
+    not utilized in the solution (line~\ref{alg:iira/reduction}).
+    The reduction involves the capacity functions of all the resources, not only of the bottleneck resource.
+    This is because, in subsequent iterations of the algorithm,
+    the introduction of new relaxations often leads to changes in the solution schedule.
+    Such changes might cause previous relaxations to no longer be necessary,
+    so in turn, every resource capacity function is reduced.
+    Note that the function \algnameref{ReduceCapacityChanges}{alg:reduce-capacity-changes}
+    takes the original resource capacity functions as input
+    and the reductions are made with respect to them.
+    As a final step, capacity migrations are found in the reduced capacity functions
+    to best utilize the existing unused capacities (line~\ref{alg:iira/additions-migrations}).
+    Any remaining capacity requirements are then fulfilled with capacity additions.
+\end{steps}
+
+The algorithm utilizes multiple procedures.
+For brevity, we exclude the detailed specifics of the procedures
+and instead offer short overviews of each procedure.
+Complete pseudocodes of the procedures are available in \cref{sec:attachments/algorithms-functions-procedures}.
 
 \begin{itemize}
     \item \algnameref{GranularResourceLoad}{alg:granular-resource-load}
@@ -198,19 +268,24 @@ Complete statements of the procedures are available in \cref{sec:attachments/alg
         increases the values of the given capacity function during the specified granular period.
         The capacity is increased in each time period covered by the granular period,
         determined by the specified granularity.
+        \todo{Granular load example}
 
     \item \algnameref{ReduceCapacityChanges}{alg:reduce-capacity-changes}
-        constructs a reduced capacity function for the given resource based on the original resource function
-        and the actual load of the resource (computed from the given solution).
-        This function reduces redundant capacity additions introduced by former relaxations,
-        so that the resource capacity function does not contain capacity additions not utilized by the solution.
+        constructs reduced capacity functions for the given problem instance based on the original resource functions
+        and the actual load of the instance resources (computed from the given solution).
+        This function reduces redundant capacity additions introduced by former relaxations
+        so that the resource capacity functions do not contain capacity additions not utilized by the solution.
 
     \item \algnameref{FindAdditionsAndMigrations}{alg:find-additions-and-migrations}
-        finds capacity additions and migrations (as defined in \cref{sec:problem-statement/alternative-schedule}).
-        First, capacity migrations are computed to utilize existing capacities in the given problem instance.
-        Then, when no other migrations are possible, the remaining capacity addition requirements are fulfilled
+        finds capacity additions and migrations,
+        as defined in \cref{subsec:problem-statement/bottlenecks/resource-capacity-modifications},
+        for the resources of the given problem instance.
+        In the same section,
+        we discussed that in real-world production systems
+        capacity migrations are preferred over capacity additions due to their comparatively small execution cost.
+        Thus, we first find all possible migrations to utilize existing capacities.
+        Then, when no other migrations are possible, the remaining capacity requirements are fulfilled
         by introducing capacity additions.
-
 \end{itemize}
 
 \todo{REVISION of algorithms}
@@ -218,54 +293,118 @@ Complete statements of the procedures are available in \cref{sec:attachments/alg
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Extended solution} \label{sec:solution-apporach/extended-solution}
 
-We propose a procedure which detects bottlenecks in the schedule and relaxes those bottlenecks to obtain
-an improved schedule.
+In this section, we present a new approach to detecting bottlenecks and relaxing related constraints
+in the \ac{rcpsp}.
+This approach is based on the idea of finding improvement intervals
+in partially relaxed versions of the given problem.
+A small subset of the improvement intervals is the selected and capacity constraints
+corresponding to the selected improvement intervals are relaxed.
 
-\begin{itemize}
-    \item 
+% -----------------------------------------------------------------------------------------------------------
+\subsection{Preliminaries} \label{subsec:solution-approach/extended-solutin/preliminaries}
 
-    \item Apply the method to identify bottlenecks
-    \item Relax bottlenecks --- one by one, combined?
-    \item Propose alternative solutions
-    \begin{itemize}
-        \item Extremal solutions based on some similarity/improvement metrics?
-        \item Scalable solution?
-    \end{itemize}
-\end{itemize}
+\begin{defn}[Left-shift closure]
+    A \emph{left-shift closure} of a job $j \in \Jobs$ is the set $\closure{j}~\subseteq~\Jobs$, inductively defined as:
+    \begin{conditions}
+        \item $j \in \closure{j}$, \label{def:closure/base}
+        \item $(\forall \precedence{i}{j} \in \Precedences):
+               \jobend{i} = \jobstart{j} \implies \closure{i} \subset \closure{j}$, \label{def:closure/precedence}
+        \item $(\forall k \in \Resources, \consumption{j}{k} > 0)
+               (\forall i \in \JobsOnResource{k}):
+               \jobend{i} = \jobstart{j} \implies \closure{i} \in \closure{j}$, and \label{def:closure/resource-precedence}
+        \item  $
+               (\forall k \in \Resources, \consumption{j}{k} > 0, \capacity{k}{\jobstart{j}-1} = 0)
+               (\forall i \in \JobsOnResource{k}):$
+               \\
+               $\mathrm{ps}_k(t) - \duration{j} \leq \jobend{i} \leq \mathrm{ps}_k(t)
+               \implies \closure{i} \subset \closure{j}
+               $, \label{def:closure/shift-pause-precedence}
+    \end{conditions}
+    where $\mathrm{ps}_k(t) \defeq \max\{t^\prime \in \intinterval{1}{t-1} : \capacity{k}{t^\prime} > 0\}$.
+\end{defn}
 
-The procedure:
+\todo{closure plot example}
 
-\begin{steps}
-    \item Find intervals to relax. \label{enum:procedureStart}
-    \item Relax proposed intervals --- migrate capacities where possible; otherwise add new capacities.
-    \item Find a solution to the modified problem.
-    \item Reduce capacity changes to only include the utilized changes.
-    \item Repeat from \cref{enum:procedureStart} for predefined number of iterations.
-\end{steps}
+This rather complicated definition describes, for a given job $j$, the set of all jobs
+preventing the job $j$ from starting in an earlier time period.
+The only exception to this interpretation is the base case --- \cref{def:closure/base}.
+\Cref{def:closure/precedence} states that a direct predecessor $i$ of the job $j$,
+given by the existence of the precedence constraint $\precedence{i}{j}$,
+is contained in $\closure{j}$ if its end time $\jobend{i}$ equals the start time $\jobstart{j}$.
+Similarly, \cref{def:closure/resource-precedence} involves all the jobs that are executed on the same
+resource as the job $j$ with directly preceding consequtive execution intervals.
+Considering the fact that jobs can be executed on multiple resources,
+only a single common resource is sufficient for the predecessor job $i$ to be contained in $\closure{j}$.
+Even the single overlapping resource requirement can cause the job $j$ to be delayed
+when the cumulative consumption of the resource, contributed to by job $i$,
+restricts the job $j$ from being scheduled earlier.
+Finally, the \cref{def:closure/shift-pause-precedence} states that the left-shift closure
+includes jobs at the end of previous working shifts.
+If the job $j$ starts at the start of a working shift ---
+during the time period before the start time period one of the consumed resources has zero capacity ---
+it could not have been scheduled at the end of the last working shift.
+It might not have been scheduled there due to the presence of other jobs
+scheduled at the end of the previous working shift.
+If the job $j$ would have been scheduled there,
+its execution interval would collide with the execution intervals of the other jobs scheduled there.
+It follows that the other jobs will be included in the left-shift closure $\closure{j}$.
 
-Find intervals to relax:
+% -----------------------------------------------------------------------------------------------------------
+\subsection{Schedule Suffix Interval Relaxing Algorithm} \label{subsec:extended-solution/schedule-suffix-interal-relaxing-algorithm}
 
-\begin{verbatim}
-For $i in j$
-\end{verbatim}
-
-
-\begin{algorithm}
-\begin{algorithmic}
-\Function{FindIntervalsToRelax}{}
-	\State $r \gets$ a random number between $0$ and $1$
-	\State $\varepsilon \gets 0.0000000000000000000000000000000000000042$
-	\If{$r\geq\varepsilon$}
-		\State execute $A$ \Comment{We discard the return value}
-	\Else
-		\State print: \texttt{Not today, sorry.}
-        \EndIf
+In this section, we formulate the \acf{ssira}.
 
 
-    \State $a$
-\EndFunction
+\begin{algorithm}[t]
+\caption{\acf{ssira}}
+\label{alg:schedule-suffix-interval-relaxing-algorithm}
+\begin{algorithmic}[1]
+
+\Params  Iterations limit $\algMaxiter$, improvement intervals limit $\algMaxintervals$,
+\Paramsc interval sort key $\algSortkey$
+\Input  Solution $\Schedule$ to a problem instance $\Instance$
+
+\State $\Instance^* \gets \Instance$, $\Schedule^* \gets \Schedule$
+       \Comment Modified instance and its solution, initially
+       \Statecr copies of the original instance and solution
+\Repeat
+    \State $\chi_1, \dots, \chi_{\algMaxintervals} \gets$ \Callref{FindIntervalsToRelax}%
+                                                                  {$\Instance^*$, $\Schedule^*$, $\algSortkey$}%
+                                                                  {alg:find-intervals-to-relax}
+    \State $\capacityf{1}^*, \dots, \capacityf{m}^* \gets$ \Callref{ModifyResourceCapacities}%
+                                                                   {$\Instance^*$, $\chi_1, \dots, \chi_{\algMaxintervals}$}%
+                                                                   {alg:modify-resource-capacities}
+    \State Find solution $\Schedule^*$ to the modified instance $\Instance^*$
+    \State $\capacityf{1}^*, \dots, \capacityf{m}^* \gets$ \Callref{ReduceCapacityChanges}%
+                                                                   {$\Instance^*$, $\Schedule^*$, $\capacityf{1},$ \dots, $\capacityf{m}$}%
+                                                                   {alg:reduce-capacity-changes}
+    \State $\Additions^{\Instance^*}, \Migrations^{\Instance^*} \gets $
+           \Callref{FindAdditionsAndMigrations}%
+                   {$\Instance^*$, $\Schedule^*$}%
+                   {alg:find-additions-and-migrations}
+\ForIter{$\algMaxiter$}
+
+\Output  Modified instance $\Instance^*$ and its solution $\Schedule^*$,
+\Outputc additions $\Additions^{\Instance^*}$, migrations $\Migrations^{\Instance^*}$
 \end{algorithmic}
-\caption{TODO}
-\label{alg:findIntervalsToRelax}
 \end{algorithm}
- 
+
+
+
+
+
+\begin{algorithm}[t]
+\caption{FindIntervalsToRelax}
+\label{alg:find-intervals-to-relax}
+\begin{algorithmic}[1]
+\Input  Problem instance $\Instance$, its solution $\Schedule$, improvement intervals limit $\algMaxintervals$,
+\Inputc interval sort key $\algSortkey$
+
+\State $X \gets$ TODO relaxed suffixes
+\State $\chi_1, \dots, \chi_{\algMaxintervals} \gets$ first $\algMaxintervals$ intervals from $X$ ordered by $\algSortkey$
+
+\Output  Improvement intervals $\chi_1, \dots, \chi_{\algMaxintervals}$,
+\Outputc a set of 3-tuples $(j, s, e) \in \Jobs \times \intinterval{1}{\horizon}^2$
+\end{algorithmic}
+\end{algorithm}
+

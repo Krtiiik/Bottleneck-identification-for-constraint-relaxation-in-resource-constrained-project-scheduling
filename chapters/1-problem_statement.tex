@@ -13,11 +13,11 @@ We use the \Problem{} variant%
 of the \ac{rcpsp} to model the targeted real-world scheduling problem.
 We extend the problem by introducing several new definitions to better model the addressed problem.
 Furthermore, we introduce the notion of problem instances to help us distinguish between the original problem
-and its modifications, as described in \cref{sec:problem-statement/alternative-schedule}.
+and its modifications, as described in \cref{sec:problem-statement/relaxed-schedule}.
 All following definitions and values are assumed to be in the integer domain.
 
 \begin{defn}[Problem instance] \label{def:problem-instance}
-A \emph{Problem instance} $\Instance$ is a 4-tuple $(\Jobs, \Precedences, \Resources, \horizon)$,
+A \emph{problem instance} $\Instance$ is defined as a 4-tuple $(\Jobs, \Precedences, \Resources, \horizon)$,
 where
 \begin{itemize}
     \item $\Jobs = \{1, \dots, n\}$ is a set of \emph{jobs},
@@ -27,12 +27,34 @@ where
 \end{itemize}
 \end{defn}
 
-\todo{RCPSP schedule diagram}
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.6\textwidth]{img/Inforest.pdf}
+    \caption{
+        Example of a precedence graph.
+        The inforest structure of the graph is demonstrated.
+        Additionally, orders as the roots of the intrees are highlighted.}
+    \label{fig:inforest}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.999\textwidth]{img/Schedule.pdf}
+    \caption{
+        Example of a scheduled \ac{rcpsp} with time-variable resource capacities.
+        The jobs with corresponding precedences from \cref{fig:inforest} are scheduled
+        on two machines with partially overlapping working shifts.
+        Job durations and capacity consumptions were chosen to illustrate the variability
+        in resource utilization.
+    }
+    \label{fig:schedule}
+\end{figure}
 
 Each job $j \in \Jobs$ has a \emph{duration} $\duration{j}$,
 describing the amount of time needed to process the job $j$.
-\emph{Preemption} of jobs is not allowed
---- the execution of a job cannot be interrupted after its start.
+\emph{Preemption} of jobs is not allowed in any form
+--- the execution of a job cannot be interrupted after its start,
+not even at the ends of working shifts (see variable resource capacities below).
 Each job $j$ also has a \emph{due date} $\deadline{j}$,
 stating a time horizon in which the job should be completed;
 otherwise, it is considered \emph{tardy}.
@@ -60,11 +82,11 @@ For a job $j$, the per-period consumption of a resource $k$ is denoted as $\cons
 This describes how much of the resource's capacity is consumed each period during the job's execution.
 Capacities are renewable, meaning that each time period the specified amount of capacity is available,
 regardless of prior capacity consumptions.
-The resource capacity functions $\capacity{k}{t}$ are assumed periodical with the same period of 24.
+The resource capacity functions $\capacity{k}{t}$ are assumed periodic with the same period of 24.
 Moreover, the resource capacity function of the resource $k$ only takes the values
 $0$ and $\shiftcapacity{k} \negmedspace>\! 0$.
 This assumption, however, is only for the initial problem instance
---- resource capacity functions of modified instances, as described in \cref{sec:problem-statement/alternative-schedule},
+--- resource capacity functions of modified instances, as described in \cref{sec:problem-statement/relaxed-schedule},
 can be non-periodical and take arbitrary non-negative integer values.
 
 The set of \emph{orders} $\Orders = \{ j \in \Jobs \mid \nexists i : \precedence{j}{i} \}$
@@ -77,16 +99,6 @@ each (weakly) connected component in the precedence graph contains exactly one o
 From this, we can say that each job is either an order
 or is associated with a unique order within the same intree component.
 This is demonstrated in \cref{fig:inforest}.
-
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=0.6\textwidth]{img/Inforest.pdf}
-    \caption{
-        Example of a precedence graph.
-        The inforest structure of the graph is demonstrated.
-        Additionally, orders as the roots of the intrees are highlighted.}
-    \label{fig:inforest}
-\end{figure}
 
 Having introduced orders, we can now specify the ranges of job deadlines and tardiness weights
 based on whether a job belongs to the orders set $\Orders$:
@@ -208,7 +220,7 @@ considering their possible relaxation.
     which would introduce slack in the constraints%
     \footnote{
     Scheduling with so-called \emph{setup times} is a broadly studied subject in the literature.
-    See the survey of \citet{Hartmann2010} where the extension of setup times is briefly described
+    See the survey of \citet{Hartmann2010} where the extension of setup times is described
     and various examples of approaches to the problem are given.
     }.
     However, we can assume that those preparations are completed before the start,
@@ -262,6 +274,18 @@ and increasing the capacity of a selected target resource
 by the specified amount over the same time interval.
 An illustrative example of a capacity addition and a capacity migration is shown in \cref{fig:CapacityChanges}.
 
+We consider migrations only between resources, limited to the same time interval.
+We do not allow migrations in time ---
+reducing the capacity of the source resource during a time interval
+and then increasing the capacity of a target resource during a different interval.
+Such migrations could correspond to migrating resource materials between resources.
+In such cases, the change in time would correspond to the migrated material
+being processed at a different time on a different machine.
+However, we consider production systems with workers and machine operators as main resource capacities.
+Considering this, migrating capacities in time would not have practical realizations,
+as the workers migrated from one resource during one time period
+would likely still be assigned to that that resource during a different time period.
+
 \begin{figure}
     \centering
     \includegraphics[width=0.7\textwidth]{img/Capacities-Changes.pdf}
@@ -274,13 +298,22 @@ $k$ is the resource whose capacity is increased,
 $s$ and $e$ form the time interval $\intinterval{s}{e}$ over which the addition is executed, and
 $c$ is the added capacity.
 Analogously, we associate a capacity migration
-with the 4-tuple $\migration{k_{\text{from}}}{k_{\text{to}}}{s}{e}{c}$, where
+with the 5-tuple $\migration{k_{\text{from}}}{k_{\text{to}}}{s}{e}{c}$, where
 $k_{\text{from}}$ is the source resource whose capacity is lowered,
 $k_{\text{to}}$ is the target resource whose capacity is increased,
 $s$ and $e$ form the time interval $\intinterval{s}{e}$ over which the migration is executed, and
 $c$ is the migrated capacity.
 For a modified instance $\Instance^*$, the sets of all migrations and additions are denoted as
 $\Migrations^{\Instance^*}$ and $\Additions^{\Instance^*}$, respectively.
+
+In a real-world production system,
+migrating capacities is generally more cost-effective than adding new capacities.
+For example, reassigning workers from an underutilized machine to a bottleneck machine
+is typically less expensive than extending workers' shifts into overtime
+or planning an entirely new and irregular shift.
+Therefore, capacity migrations are usually preferred.
+However, if the required capacity changes cannot be achieved through capacity migrations,
+capacity additions can be utilized.
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Relaxed schedule} \label{sec:problem-statement/relaxed-schedule}
