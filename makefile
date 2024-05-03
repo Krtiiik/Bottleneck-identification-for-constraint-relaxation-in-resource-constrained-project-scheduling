@@ -1,12 +1,10 @@
-latex=pdflatex
-latex_args=-synctex=1 -interaction=nonstopmode -quiet
-latex_garbage=pdfa.xmpi thesis.log thesis.out thesis.aux thesis.toc thesis.synctex.gz chapters\\*.aux bibliography\\*.aux
-cln=del $(latex_garbage)
+all: thesis.pdf abstract-cs.pdf abstract-en.pdf
 
-build:
-	$(latex) $(latex_args) thesis
-	$(latex) $(latex_args) thesis
-	$(cln)
+%.pdf: force
+	latexmk $*.tex
 
 clean:
-	$(cln)
+	rm -rf tmp
+	rm -f thesis.pdf abstract.pdf abstract-cs.pdf abstract-en.pdf
+
+.PHONY: force

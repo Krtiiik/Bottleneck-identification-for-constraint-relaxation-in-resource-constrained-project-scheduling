@@ -20,7 +20,7 @@ More about the library and running the experiments can be found in \cref{sec:att
 \footnote{Available online at \url{https://www.om-db.wi.tum.de/psplib/}}
 --- set of benchmark instances for the \ac{rcpsp}.
 This set has since been used to evaluate and compare many results in the literature.
-(For example, some recent papers from \citet{Bianco2011}, \citet{Cheng2015}, or \citet{Elsayed2017}.)
+For example, see some recent papers from \citet{Bianco2011}, \citet{Cheng2015}, or \citet{Elsayed2017}.
 
 We will use and modify specific instances from the PSPLIB single-mode instance set.
 Instances from this set model the standard \ac{rcpsp}.
@@ -103,7 +103,7 @@ that were formed by the precedence graph-splitting process described above.
 
 \begin{table}[p]
     \centering
-    \begin{tabularx}{0.88\textwidth}{lXcX}
+    \begin{tabularx}{0.95\textwidth}{lXcX}
         \toprule
         \textbf{Instances} & \textbf{Basefiles} & $|\Resources|$ & \textbf{Resource shifts} \\
         \midrule
@@ -170,7 +170,7 @@ that were formed by the precedence graph-splitting process described above.
         Following are columns describing the resource characteristics of the instance group ---
         the number of resources and the resource availability profiles.
         The resource availability profiles consist of three possible shifts ---
-        morning (M), afternoon (A), and night (N) ---
+        morning~(M), afternoon~(A), and night~(N) ---
         representing that the resource is available each day (period of 24 time periods)
         during the corresponding multiples of the time periods
         $\intinterval{7}{14}$, $\intinterval{15}{22}$, and $\intinterval{1}{6} \cup \{23, 24\}$ respectively.

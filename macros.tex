@@ -1,6 +1,47 @@
 %%% This file contains definitions of various useful macros and environments %%%
 %%% Please add more macros here instead of cluttering other files with them. %%%
 
+%%% Switches based on thesis type
+
+\def\TypeBc{bc}
+\def\TypeMgr{mgr}
+\def\TypePhD{phd}
+\def\TypeRig{rig}
+
+\ifx\ThesisType\TypeBc
+\def\ThesisTypeName{bachelor}
+\def\ThesisTypeTitle{BACHELOR THESIS}
+\fi
+
+\ifx\ThesisType\TypeMgr
+\def\ThesisTypeName{master}
+\def\ThesisTypeTitle{MASTER THESIS}
+\fi
+
+\ifx\ThesisType\TypePhD
+\def\ThesisTypeName{doctoral}
+\def\ThesisTypeTitle{DOCTORAL THESIS}
+\fi
+
+\ifx\ThesisType\TypeRig
+\def\ThesisTypeName{rigorosum}
+\def\ThesisTypeTitle{RIGOROSUM THESIS}
+\fi
+
+\ifx\ThesisTypeName\undefined
+\PackageError{thesis}{Unknown thesis type.}{Please check the definition of ThesisType in metadata.tex.}
+\fi
+
+%%% Switches based on study program language
+
+\def\LangCS{cs}
+\def\LangEN{en}
+
+\ifx\StudyLanguage\LangCS
+\else\ifx\StudyLanguage\LangEn
+\else\PackageError{thesis}{Unknown study language.}{Please check the definition of StudyLanguage in metadata.tex.}
+\fi\fi
+
 %%% Minor tweaks of style
 
 % These macros employ a little dirty trick to convince LaTeX to typeset
@@ -9,7 +50,7 @@
 \makeatletter
 \def\@makechapterhead#1{
   {\parindent \z@ \raggedright \normalfont
-   \Huge\bfseries \thechapter. #1
+   \Huge\bfseries \thechapter\quad #1
    \par\nobreak
    \vskip 20\p@
 }}
@@ -37,30 +78,45 @@
 \newtheorem{thm}{Theorem}
 \newtheorem{lemma}[thm]{Lemma}
 \newtheorem{claim}[thm]{Claim}
-
-\theoremstyle{plain}
 \newtheorem{defn}{Definition}
-\newtheorem*{defn*}{Definition}
 
 \theoremstyle{remark}
 \newtheorem*{cor}{Corollary}
 \newtheorem*{rem}{Remark}
 \newtheorem*{example}{Example}
 
-%%% An environment for proofs
+%%% Style of captions of floating objects (figures etc.)
 
-\newenvironment{myproof}{
-  \par\medskip\noindent
-  \textit{Proof}.
-}{
-\newline
-\rightline{$\qedsymbol$}
-}
+\ifcsname DeclareCaptionStyle\endcsname
+\DeclareCaptionStyle{thesis}{style=base,font=small,labelfont=bf,labelsep=quad}
+\captionsetup{style=thesis}
+% \captionsetup[algorithm]{style=thesis,singlelinecheck=off}
+% \captionsetup[listing]{style=thesis,singlelinecheck=off}
+\fi
 
 %%% An environment for typesetting of program code and input/output
-%%% of programs. (Requires the fancyvrb package -- fancy verbatim.)
-
+%%% of programs.
 \DefineVerbatimEnvironment{code}{Verbatim}{fontsize=\small, frame=single}
+
+% Settings for lstlisting -- program listing with syntax highlighting
+\ifcsname lstset\endcsname
+\lstset{
+  language=C++,
+  tabsize=2,
+  showstringspaces=false,
+  basicstyle=\footnotesize\tt\color{black!75},
+  identifierstyle=\bfseries\color{black},
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{red!50!black},
+  keywordstyle=\color{blue!75!black}}
+\fi
+
+% Floating listings, used in the same way as the figure environment
+\ifcsname DeclareNewFloatType\endcsname
+\DeclareNewFloatType{listing}{}
+\floatsetup[listing]{style=ruled}
+\floatname{listing}{Program}
+\fi
 
 %%% The field of all real and natural numbers
 \newcommand{\R}{\mathbb{R}}
@@ -69,12 +125,15 @@
 
 %%% Useful operators for statistics and probability
 \DeclareMathOperator{\pr}{\textsf{P}}
-\DeclareMathOperator{\E}{\textsf{E}\,}
+\DeclareMathOperator{\E}{\textsf{E}}
 \DeclareMathOperator{\var}{\textrm{var}}
 \DeclareMathOperator{\sd}{\textrm{sd}}
 
 %%% Transposition of a vector/matrix
 \newcommand{\T}[1]{#1^\top}
+
+%%% Asymptotic "O"
+\def\O{\mathcal{O}}
 
 %%% Various math goodies
 \newcommand{\goto}{\rightarrow}
@@ -84,9 +143,40 @@
 \newcommand{\dint}{\int_0^\tau\!\!\int_0^\tau}
 \newcommand{\isqr}[1]{\frac{1}{\sqrt{#1}}}
 
-%%% Various table goodies
-\newcommand{\pulrad}[1]{\raisebox{1.5ex}[0pt]{#1}}
-\newcommand{\mc}[1]{\multicolumn{1}{c}{#1}}
+%%% TODO items: remove before submitting :)
+\newcommand{\xxx}[1]{\textcolor{red!}{#1}}
+
+%%% Detailed settings of bibliography
+
+\ifx\citet\undefined\else
+
+% Maximum number of authors of a single work. If exceeded, "et al." is used.
+%\ExecuteBibliographyOptions{maxnames=2}
+% The same setting specific to citations using \citet{...}
+\ExecuteBibliographyOptions{maxcitenames=2}
+% The same settings specific to the list of literature
+%\ExecuteBibliographyOptions{maxbibnames=2}
+
+% Shortening first names of authors: "E. A. Poe" instead of "Edgar Allan Poe"
+%\ExecuteBibliographyOptions{giveninits}
+% The same without dots ("EA Poe")
+%\ExecuteBibliographyOptions{terseinits}
+
+% If your bibliography entries are hard to break into lines, try this mode:
+%\ExecuteBibliographyOptions{block=ragged}
+
+% Possibly reverse the names of the authors with the non-ISO styles:
+%\DeclareNameAlias{default}{family-given}
+
+% Use caps-and-small-caps for family names in ISO 690 style.
+\let\familynameformat=\textsc
+
+% We want to separate multiple authors in citations by commas
+% (while we use semicolons in the bibliography as per the ISO standard)
+\DeclareDelimFormat[textcite]{multinamedelim}{\addcomma\space}
+\DeclareDelimFormat[textcite]{finalnamedelim}{\space and~}
+
+\fi
 
 %%% My macros ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -285,3 +375,4 @@
 
 \newcommand{\relaxedSchedule}[1]{\vec{\Schedule}^{(#1)}}
 \newcommand{\relaxedjobstart}[2]{\relaxedSchedule{#1}_{#2}}
+
