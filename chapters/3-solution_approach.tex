@@ -203,7 +203,8 @@ The \acf{iira} is given in \cref{alg:identification-indicator-relaxing-algorithm
 The algorithm consists of a main loop (lines~\ref{alg:iira/repeat}--\ref{alg:iira/for-iters}),
 the input of which is a problem instance and its solution,
 the output of which is a modified problem instance and its solution.
-In each iteration of the main loop, the following steps are executed:
+We describe the individual steps performed by the algorithm in the following outline.
+
 \begin{steps}
     \item
     First, the solution is evaluated using the given identification indicator
@@ -221,7 +222,10 @@ In each iteration of the main loop, the following steps are executed:
     in a preceding or following granular period.
     This is why the granular load is convolved with a kernel function of choice,
     which propagates the information about high resource utilization
-    to consecutive granular periods. \label{alg/iira-steps/identification}
+    to consecutive granular periods.
+    The result of the convolution is trimmed to only contain "valid" values,
+    i.e. values computed directly on the interval $\intinterval{1}{PC}$.
+    \label{alg/iira-steps/identification}
 
     \item
     A small subset of granular periods is selected for the increase in capacity.
@@ -248,12 +252,12 @@ In each iteration of the main loop, the following steps are executed:
     Note that the function \algnameref{ReduceCapacityChanges}{alg:reduce-capacity-changes}
     takes the original resource capacity functions as input
     and the reductions are made with respect to them.
-    As a final step, capacity migrations are found in the reduced capacity functions
+    As a final step, capacity migrations are computed in the reduced capacity functions
     to best utilize the existing unused capacities (line~\ref{alg:iira/additions-migrations}).
     Any remaining capacity requirements are then fulfilled with capacity additions.
 \end{steps}
 
-The algorithm utilizes multiple procedures.
+The algorithm utilizes multiple additional procedures and functions.
 For brevity, we exclude the detailed specifics of the procedures
 and instead offer short overviews of each procedure.
 Complete pseudocodes of the procedures are available in \cref{sec:attachments/algorithms-functions-procedures}.
@@ -263,12 +267,12 @@ Complete pseudocodes of the procedures are available in \cref{sec:attachments/al
         computes a granular resource load for a given resource.
         The granular load is a function mapping granular periods to the cumulative sum of the load
         of the resource over the specified granular period.
+        \todo{Granular load example}
         
     \item \algnameref{IncreaseGranularPeriodCapacity}{alg:increase-granular-period-capacity}
         increases the values of the given capacity function during the specified granular period.
         The capacity is increased in each time period covered by the granular period,
         determined by the specified granularity.
-        \todo{Granular load example}
 
     \item \algnameref{ReduceCapacityChanges}{alg:reduce-capacity-changes}
         constructs reduced capacity functions for the given problem instance based on the original resource functions
@@ -293,66 +297,140 @@ Complete pseudocodes of the procedures are available in \cref{sec:attachments/al
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Extended solution} \label{sec:solution-apporach/extended-solution}
 
-In this section, we present a new approach to detecting bottlenecks and relaxing related constraints
-in the \ac{rcpsp}.
-This approach is based on the idea of finding improvement intervals
+In this section, we present a novel method for detecting bottlenecks
+and relaxing related constraints in the \ac{rcpsp}.
+The method is based on finding improvement intervals
 in partially relaxed versions of the given problem.
-A small subset of the improvement intervals is the selected and capacity constraints
+A small subset of the improvement intervals is then selected and capacity constraints
 corresponding to the selected improvement intervals are relaxed.
+The primary goal is to identify relaxations that focus specifically on the target order.
+By doing so, we hope to achieve great improvements in the tardiness of the target order
+while maintaining low capacity modification costs and induced schedule differences.
+In doing so, we aim to improve the tardiness of the target order
+while keeping capacity modification costs and the induced schedule differences to a minimum.
 
 % -----------------------------------------------------------------------------------------------------------
 \subsection{Preliminaries} \label{subsec:solution-approach/extended-solutin/preliminaries}
 
-\begin{defn}[Left-shift closure]
-    A \emph{left-shift closure} of a job $j \in \Jobs$ is the set $\closure{j}~\subseteq~\Jobs$, inductively defined as:
+Before we formulate the \acl{ssira},
+we need to state a few definitions and ideas upon which the algorithm is designed.
+First, we define the \emph{suffix-relaxed schedule} as a modification of an obtained schedule solution
+where the algorithm finds improvement intervals.
+We then define the \emph{left-shift closure} as a tool
+for focusing the search for improvement intervals towards improving the tardiness of the target order.
+
+\begin{defn}[Suffix-relaxed schedule] \label{def:suffix-relaxed-schedule}
+    Let $\Schedule = (\jobstart{1}, \dots, \jobstart{n})$ be a schedule to a problem instance $\Instance$.
+    Given a time period $t \in \intinterval{1}{\horizon}$,
+    the \emph{suffix-relaxed schedule} for the time period $t$ is given by
+    $\relaxedSchedule{t} = (\relaxedjobstart{t}{1}, \dots, \relaxedjobstart{t}{n})$, where
+    $$
+    \relaxedjobstart{t}{j} \defeq \begin{cases}
+        \jobstart{j} & \text{if $\jobstart{j} \leq t$;} \\
+        \max\left\{\relaxedjobstart{t}{j} : \precedence{i}{j} \in \Precedences \right\} & \text{otherwise.}
+    \end{cases}
+    $$
+\end{defn}
+
+\todo{example}
+
+For a given job $j$, the value of $\relaxedjobstart{t}{j}$
+depends only on the values $\relaxedjobstart{t}{i}$ of its precedence predecessors $i$,
+given by precedences $\precedence{i}{j}$.
+Since the precedence graph is oriented and acyclic,
+all values of $\relaxedSchedule{t}$ are well-defined and the definition is correct.
+
+The suffix-relaxed schedule for a time period $t$ is a modification of the original schedule
+where the start times of jobs starting in time periods up to $t$ remain unchanged,
+and the start times of jobs scheduled to start later can be shifted to earlier time periods,
+constrained only by precedence constraints.
+This essentially relaxes resource capacity constraints for all jobs that, in the original schedule,
+start after the time period $t$.
+
+The idea is that a job scheduled during the later time periods could not be scheduled earlier
+due to the lack of remaining capacity on the required resources,
+assuming sufficient slack in precedence constraints.
+By fully relaxing the resource capacity constraints in the suffix of a schedule,
+we can compute potential starting times for jobs scheduled in that suffix,
+had they not been constrained by the resource capacity constraints.
+Following this, we can observe the potential improvements in the starting times
+and the consequent required resource capacity relaxations.
+
+\begin{defn}[Left-shift closure] \label{def:left-shift-closure}
+    A \emph{left-shift closure} of a job $j \in \Jobs$ is the set $\closure{j}~\subseteq~\Jobs$, where:
     \begin{conditions}
-        \item $j \in \closure{j}$, \label{def:closure/base}
-        \item $(\forall \precedence{i}{j} \in \Precedences):
-               \jobend{i} = \jobstart{j} \implies \closure{i} \subset \closure{j}$, \label{def:closure/precedence}
-        \item $(\forall k \in \Resources, \consumption{j}{k} > 0)
-               (\forall i \in \JobsOnResource{k}):
-               \jobend{i} = \jobstart{j} \implies \closure{i} \in \closure{j}$, and \label{def:closure/resource-precedence}
-        \item  $
-               (\forall k \in \Resources, \consumption{j}{k} > 0, \capacity{k}{\jobstart{j}-1} = 0)
-               (\forall i \in \JobsOnResource{k}):$
-               \\
-               $\mathrm{ps}_k(t) - \duration{j} \leq \jobend{i} \leq \mathrm{ps}_k(t)
-               \implies \closure{i} \subset \closure{j}
-               $, \label{def:closure/shift-pause-precedence}
+        \item
+            $j \in \closure{j}$ \label{def:closure/base}
+
+        \item
+            All precedence predecessors directly preceding in the schedule are included.
+            $$
+            (\forall \precedence{i}{j} \in \Precedences):
+            \jobend{i} = \jobstart{j} \implies \closure{i} \subset \closure{j}
+            $$ \label{def:closure/precedence}
+            \vspace{-2em}
+
+        \item
+            All jobs consuming a common resource directly preceding in the schedule are included.
+            $$
+            (\forall k \in \Resources, \consumption{j}{k} > 0)
+            (\forall i \in \JobsOnResource{k}):
+            \jobend{i} = \jobstart{j} \implies \closure{i} \subset \closure{j}
+            $$ \label{def:closure/resource-precedence}
+            \vspace{-2em}
+
+        \item
+            If $j$ is scheduled exactly at the start of a working shift,
+            all jobs scheduled at the end of the previous working shift are included.
+            \begin{multline*}
+            (\forall k \in \Resources, \consumption{j}{k} > 0, \capacity{k}{\jobstart{j}-1} = 0)
+            (\forall i \in \JobsOnResource{k}):
+            \\
+            \mathrm{ps}_k(\jobstart{j}) - \duration{j} \leq \jobend{i} \leq \mathrm{ps}_k(\jobstart{j})
+            \implies \closure{i} \subset \closure{j}
+            \end{multline*} \label{def:closure/shift-pause-precedence}
+            where $\mathrm{ps}_k(t) \defeq \max\{t^\prime \in \intinterval{1}{t-1} : \capacity{k}{t^\prime} > 0\}$.
     \end{conditions}
-    where $\mathrm{ps}_k(t) \defeq \max\{t^\prime \in \intinterval{1}{t-1} : \capacity{k}{t^\prime} > 0\}$.
 \end{defn}
 
 \todo{closure plot example}
 
-This rather complicated definition describes, for a given job $j$, the set of all jobs
+The left-shift closure of a job $j$ defines the set of all jobs
 preventing the job $j$ from starting in an earlier time period.
-The only exception to this interpretation is the base case --- \cref{def:closure/base}.
+The only exception to this interpretation is the \cref{def:closure/base},
+which simplifies the inductive definition.
+
 \Cref{def:closure/precedence} states that a direct predecessor $i$ of the job $j$,
-given by the existence of the precedence constraint $\precedence{i}{j}$,
-is contained in $\closure{j}$ if its end time $\jobend{i}$ equals the start time $\jobstart{j}$.
-Similarly, \cref{def:closure/resource-precedence} involves all the jobs that are executed on the same
-resource as the job $j$ with directly preceding consequtive execution intervals.
-Considering the fact that jobs can be executed on multiple resources,
-only a single common resource is sufficient for the predecessor job $i$ to be contained in $\closure{j}$.
-Even the single overlapping resource requirement can cause the job $j$ to be delayed
-when the cumulative consumption of the resource, contributed to by job $i$,
-restricts the job $j$ from being scheduled earlier.
-Finally, the \cref{def:closure/shift-pause-precedence} states that the left-shift closure
-includes jobs at the end of previous working shifts.
-If the job $j$ starts at the start of a working shift ---
-during the time period before the start time period one of the consumed resources has zero capacity ---
-it could not have been scheduled at the end of the last working shift.
-It might not have been scheduled there due to the presence of other jobs
-scheduled at the end of the previous working shift.
-If the job $j$ would have been scheduled there,
-its execution interval would collide with the execution intervals of the other jobs scheduled there.
-It follows that the other jobs will be included in the left-shift closure $\closure{j}$.
+indicated by the precedence constraint $\precedence{i}{j}$,
+is included in $\closure{j}$ if the jobs are scheduled consecutively.
+Jobs $i$ and $j$ are scheduled consecutively if the execution of the job~$i$ ends
+at the exact same time period where the execution of the job $j$ starts,
+i.e. $\jobend{i} = \jobstart{j}$.
+
+\Cref{def:closure/resource-precedence} involves all jobs scheduled consecutively with the job $j$,
+which share at least one required resource.
+Jobs can be executed on multiple resources,
+but sharing just one resource is sufficient for the jobs to influence each other.
+This resource requirement overlap can delay the job $j$ if its predecessor job $i$'s resource consumption
+prevents the job $j$ from being scheduled earlier.
+
+Lastly, \cref{def:closure/shift-pause-precedence} involves jobs at the end of previous working shifts.
+Assuming sufficient slack in precedence constraints,
+the job $j$ starts exactly at the start of a working shift because
+it could not have been scheduled at the end of the previous working shift
+due to the lack of remaining capacities on its required resources.
+Jobs scheduled at the end of the previous working shift consume the required resources
+and thus prevent the job $j$ from being scheduled there.
 
 % -----------------------------------------------------------------------------------------------------------
 \subsection{Schedule Suffix Interval Relaxing Algorithm} \label{subsec:extended-solution/schedule-suffix-interal-relaxing-algorithm}
 
-In this section, we formulate the \acf{ssira}.
+Having presented the main concepts in the previous section,
+we now formulate the \acf{ssira} in \cref{alg:schedule-suffix-interval-relaxing-algorithm}.
+The formulation of the algorithm itself is quite simple.
+The core procedure is encapsulated in the
+\algnameref{Find\-Intervals\-To\-Relax}{alg:find-intervals-to-relax} function,
+formulated in \cref{alg:find-intervals-to-relax}.
 
 
 \begin{algorithm}[t]
@@ -362,27 +440,31 @@ In this section, we formulate the \acf{ssira}.
 
 \Params  Iterations limit $\algMaxiter$, improvement intervals limit $\algMaxintervals$,
 \Paramsc interval sort key $\algSortkey$
-\Input  Solution $\Schedule$ to a problem instance $\Instance$
+\Input  Solution $\Schedule$ to a problem instance $\Instance$, target order $\targetOrder$
 
 \State $\Instance^* \gets \Instance$, $\Schedule^* \gets \Schedule$
        \Comment Modified instance and its solution, initially
        \Statecr copies of the original instance and solution
-\Repeat
+\Repeat \label{alg:ssira/repeat}
     \State $\chi_1, \dots, \chi_{\algMaxintervals} \gets$ \Callref{FindIntervalsToRelax}%
-                                                                  {$\Instance^*$, $\Schedule^*$, $\algSortkey$}%
+                                                                  {$\Instance^*$, $\Schedule^*$, $\algMaxintervals$, $\algSortkey$, $\targetOrder$}%
                                                                   {alg:find-intervals-to-relax}
+                                                                  \label{alg:ssira/ints}
     \State $\capacityf{1}^*, \dots, \capacityf{m}^* \gets$ \Callref{ModifyResourceCapacities}%
                                                                    {$\Instance^*$, $\chi_1, \dots, \chi_{\algMaxintervals}$}%
                                                                    {alg:modify-resource-capacities}
-    \State Find solution $\Schedule^*$ to the modified instance $\Instance^*$
+                                                                   \label{alg:ssira/modify}
+    \State Find solution $\Schedule^*$ to the modified instance $\Instance^*$ \label{alg:ssira/solution}
     \State $\capacityf{1}^*, \dots, \capacityf{m}^* \gets$ \Callref{ReduceCapacityChanges}%
                                                                    {$\Instance^*$, $\Schedule^*$, $\capacityf{1},$ \dots, $\capacityf{m}$}%
                                                                    {alg:reduce-capacity-changes}
+                                                                   \label{alg:ssira/reduction}
     \State $\Additions^{\Instance^*}, \Migrations^{\Instance^*} \gets $
            \Callref{FindAdditionsAndMigrations}%
                    {$\Instance^*$, $\Schedule^*$}%
                    {alg:find-additions-and-migrations}
-\ForIter{$\algMaxiter$}
+                   \label{alg:ssira/additions-migrations}
+\ForIter{$\algMaxiter$} \label{alg:ssira/for-iters}
 
 \Output  Modified instance $\Instance^*$ and its solution $\Schedule^*$,
 \Outputc additions $\Additions^{\Instance^*}$, migrations $\Migrations^{\Instance^*}$
@@ -390,21 +472,118 @@ In this section, we formulate the \acf{ssira}.
 \end{algorithm}
 
 
+The algorithm consists of a main loop (lines~\ref{alg:ssira/repeat}--\ref{alg:ssira/for-iters}),
+the input of which is a problem instance and its solution,
+the output of which is a modified problem instance and its solution.
+In each iteration of the main loop, the algorithm first finds improvement intervals (line~\ref{alg:ssira/ints}).
+Then, resource capacity functions are modified based on these intervals (line~\ref{alg:ssira/modify}).
+The subsequent steps (lines~\ref{alg:ssira/solution}--\ref{alg:ssira/additions-migrations}) mirror those of the \ac{iira},
+as stated in detail in \cref{subsec:solution-approach/baseline-solution/iira}.
+A new solution to the modified problem instance is found,
+the modified resource capacity functions are reduced based on that solution,
+and capacity migrations and additions are computed in the reduced capacity functions.
 
 
-
-\begin{algorithm}[t]
+\begin{algorithm}[b]
 \caption{FindIntervalsToRelax}
 \label{alg:find-intervals-to-relax}
 \begin{algorithmic}[1]
-\Input  Problem instance $\Instance$, its solution $\Schedule$, improvement intervals limit $\algMaxintervals$,
-\Inputc interval sort key $\algSortkey$
 
-\State $X \gets$ TODO relaxed suffixes
-\State $\chi_1, \dots, \chi_{\algMaxintervals} \gets$ first $\algMaxintervals$ intervals from $X$ ordered by $\algSortkey$
+\Input  Problem instance $\Instance$, its solution $\Schedule$, improvement intervals limit $\algMaxintervals$,
+\Inputc interval sort key $\algSortkey$, target order $\targetOrder$
+
+\For {$t \in \intinterval{1}{\horizon}$}
+    $\relaxedSchedule{t} \gets$ \Callref{ComputeSuffixRelaxedSchedule}%
+                                        {$\Instance$, $\Schedule$, $t$}%
+                                        {alg:suffix-relaxed-schedule}  \label{alg:ssira/ints/schedule-suffixes}
+\EndFor
+\State $\closure{\targetOrder} \gets$ \Callref{ComputeLeftShiftClosure}%
+                                              {$\Instance$, $\Schedule$, $\targetOrder$}%
+                                              {alg:left-shift-closure}  \label{alg:ssira/ints/closure}
+\State $X \gets \emptyset$  \label{alg:ssira/ints/ints-init}
+\For {$j \in \closure{\targetOrder}$}
+    \State $s \gets \min_t \left\{ \relaxedjobstart{t}{j} : \relaxedjobstart{t}{j} < \jobstart{j} \right\}$  \label{alg:ssira/ints/ints-improvement}
+        \Comment Find the earliest improvement
+    \State $X \gets X \cup \left\{ (j,\; s,\; s + \duration{j}) \right\}$  \label{alg:ssira/ints/ints-inclusion}
+\EndFor
+
+\State $\chi_1, \dots, \chi_{\algMaxintervals} \gets$ first $\algMaxintervals$ intervals from $X$ ordered by $\algSortkey$  \label{alg:ssira/ints/select-imp-ints}
 
 \Output  Improvement intervals $\chi_1, \dots, \chi_{\algMaxintervals}$,
 \Outputc a set of 3-tuples $(j, s, e) \in \Jobs \times \intinterval{1}{\horizon}^2$
 \end{algorithmic}
 \end{algorithm}
 
+The \algnameref{FindIntervalsToRelax}{alg:find-intervals-to-relax} function consists of initializations,
+the search for improvement intervals, and a preference-selection of intervals.
+We describe the individual steps performed in the function in the following outline.
+
+\begin{steps}
+    \item
+        Suffix-relaxed schedules are computed for each time period within the scheduling horizon
+        (line~\ref{alg:ssira/ints/schedule-suffixes}).
+        These schedules represent all possible job-interval relaxations,
+        from which potential improvement intervals are subsequently identified and selected.
+        Following this, the left-shift closure of the target order is computed (line~\ref{alg:ssira/ints/closure}).
+        This closure represents the set of jobs considered for improvement.
+
+    \item
+        Potential improvement intervals are identified iteratively
+        for jobs within the left-shift closure of the target order
+        (lines~\ref{alg:ssira/ints/ints-init}--\ref{alg:ssira/ints/ints-inclusion}).
+        For each job in the closure,
+        the start of the potential improvement interval is determined
+        as the earliest improving time for that job across all suffix-relaxed schedules
+        (line~\ref{alg:ssira/ints/ints-improvement}).
+        The start time of a job in a suffix-relaxed schedule is considered improving
+        if it is earlier than the start time in the original schedule.
+        Then, the potential improvement interval for the job is constructed (line~\ref{alg:ssira/ints/ints-inclusion}),
+        incorporating the identified earliest improving time and the job's execution duration.
+        The constructed potential improvement interval is added to the set of potential improvement intervals
+        for the subsequent selection of preferred improvement intervals.
+
+    \item
+        Predefined number of improvement intervals are selected based on a specified sort key
+        (line~\ref{alg:ssira/ints/select-imp-ints}).
+        The potential improvement intervals are ordered according to the sort key,
+        and the first intervals from this ordering are selected as the proposed improvement intervals.
+\end{steps}
+
+The \ac{ssira} and the \algnameref{FindIntervalsToRelax}{alg:find-intervals-to-relax} function
+both utilize multiple additional procedures and functions.
+The \algnameref{ReduceCapacityChanges}{alg:reduce-capacity-changes}
+and \algnameref{FindAdditionsAndMigrations}{alg:find-additions-and-migrations}
+functions used by the \ac{ssira} are the same functions as those used by the \ac{iira}.
+Their overview was given in \cref{subsec:solution-approach/baseline-solution/iira}.
+For brevity, we exclude the detailed specifics of the
+remaining functions and instead offer their short overviews.
+Complete pseudocodes of the functions are available in \cref{sec:attachments/algorithms-functions-procedures}.
+
+\begin{itemize}
+    \item \algnameref{ModifyResourceCapacities}{alg:modify-resource-capacities}
+        modifies the resource capacity functions of a given problem instance
+        by increasing their capacities within the specified improvement intervals.
+        Each improvement interval is associated with a particular job.
+        For every resource required by that job,
+        its resource capacity function is increased by the job's required resource consumption of that resource
+        over the duration of the improvement interval.
+
+    \item \algnameref{ComputeSuffixRelaxedSchedule}{alg:suffix-relaxed-schedule}
+        computes the suffix-relaxed schedule for a specified time period,
+        as defined in \cref{def:suffix-relaxed-schedule}.
+        Initially, the topological order of the jobs in the instance is determined.
+        Then, for each job considered in the topological order,
+        its start time in the suffix-relaxed schedule is determined:
+        if the job was scheduled up to the specified time period,
+        its original start time is used;
+        otherwise, the latest end time of its precedence predecessors is computed in the suffix-relaxed schedule,
+        and this value is used.
+        This maximum is well-defined due to the jobs being processed in topological ordering and thus,
+        all values have been determined by the time they are first considered in the maxima.
+
+    \item \algnameref{ComputeLeftShiftClosure}{alg:left-shift-closure}
+        computes the left-shift closure of a specified job, as defined in \cref{def:left-shift-closure}.
+        The precedence graph is traversed in a breadth-first manner, starting from the specified job.
+        The traversal considers only the jobs that correspond to the defining
+        \cref{def:closure/precedence,def:closure/resource-precedence,def:closure/shift-pause-precedence}.
+\end{itemize}

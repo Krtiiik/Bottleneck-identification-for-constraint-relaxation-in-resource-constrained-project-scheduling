@@ -113,6 +113,10 @@
 \section*{#1}
 \addcontentsline{toc}{section}{#1}
 }
+\def\subsecwithtoc#1{
+\subsection*{#1}
+\addcontentsline{toc}{subsection}{#1}
+}
 
 \newcommand*{\fullref}[1]{\hyperref[{#1}]{\autoref*{#1} - \nameref*{#1}}}
 
@@ -137,6 +141,8 @@
     \hfill%
     \hskip.3in}
 
+\newcommand{\rotatepageangle}{\ifodd{\thepage}{90}\else{270}\fi}
+
 %%% Algorithms --------------------------------------------------------------------------
 
 \algrenewcommand\algorithmicdo{\textbf{:}}
@@ -158,6 +164,7 @@
 \algnewcommand\Params{\item[\algorithmicparams]}%
 \algnewcommand\Paramsc{\item[\algorithmicparamsc]}%
 \algnewcommand\Note{\footnotesize\item[\textit{Note:}]}%
+\algnewcommand\Notec{\footnotesize\item[\phantom{\textit{Note:}}]}%
 \newcommand{\Callref}[3]{\hyperref[{#3}]{\Call{#1}{#2}}}
 \newcommand{\algnameref}[2]{\hyperref[{#2}]{\textproc{#1}}}
 
@@ -258,6 +265,9 @@
 \newcommand{\algMaxintervals}{IT_{\max}}
 \newcommand{\algSortkey}{\mathcal{K}}
 
+\newcommand{\algSortkeyTime}{\algSortkey_{t}}
+\newcommand{\algSortkeyImprovement}{\algSortkey_{\Delta\jobstart{}}}
+
 \newcommand{\convPre}{f_{\text{pre}}}
 \newcommand{\convAround}{f_{\text{around}}}
 \newcommand{\convPost}{f_{\text{post}}}
@@ -269,3 +279,9 @@
 \newcommand{\kpiCost}{\operatorname{cost}}
 \newcommand{\kpiDiff}{\Delta\jobstart{}}
 \newcommand{\kpiDuration}{\operatorname{time}}
+
+\newcommand{\inst}[2]{\texttt{instance0#1\ifthenelse{\equal{#2}{}}{}{\_#2}}}
+\newcommand{\instGroup}[1]{\texttt{instance0#1*}}
+
+\newcommand{\relaxedSchedule}[1]{\vec{\Schedule}^{(#1)}}
+\newcommand{\relaxedjobstart}[2]{\relaxedSchedule{#1}_{#2}}

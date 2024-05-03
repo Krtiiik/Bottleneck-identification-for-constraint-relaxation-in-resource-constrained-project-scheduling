@@ -3,32 +3,54 @@
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section*{Motivation} \label{sec:introduction/motivation}
 
-\begin{itemize}
-    \item \ac{aps} software usage
-    \begin{itemize}
-        \item Standard use case
-        \item Limitations (incomplete information, hard-to-define scheduling intuition , \dots)
-        \item \todo{Some literature on \ac{aps}}
-    \end{itemize}
+In modern manufacturing systems, \ac{aps} software is used to schedule production,
+manage resources, and analyze complex production data.
+This software helps manufacturing planners to schedule production plans
+and make important decisions regarding the manufacturing systems.
+Modeling and solving such tasks is very difficult, especially in larger manufacturing systems.
+The production needs to meet demand while performing optimally with respect to multiple,
+often competing, optimization goals.
+For humans --- even knowledgeable professionals ---
+the set of constraints and conflicting priorities becomes too complex to gain full insight
+and consequently decisions can be made without full understanding of the impact.
+Conversely, the \ac{aps} software is capable of processing extensive data,
+however, not all information can be specified in advance,
+nor can all information about the real-world be exactly modeled for the software to consider.
+Moreover, the software lacks the intuition of a human production planner,
+which undoubtedly plays an important role in making decisions.
+This leads to users of the \ac{aps} software to plan production by iteratively
+scheduling and fine-tuning settings to obtain an acceptable schedule.
 
-    \item Problem to tackle
-    \begin{itemize}
-        \item \todo{What is our problem, examples, figures}
-        \item Selected tardy job(s)
-        \item Identifying bottlenecks for the selected jobs
-        \item Constraint relaxation --- moving or adding capacities, overtimes, \dots
-    \end{itemize}
-\end{itemize}
+In this thesis, we address the problem of reducing the tardiness of a selected order.
+Upon obtaining a schedule constructed to meet all the extensive production demands,
+we observe that a particular order is overly tardy with respect to its deadline.
+We would like to obtain a modified schedule which reduces the tardiness of that order
+while not differing from the original schedule much.
+This corresponds to a scenario where, for example, after a discussion with the intended customer,
+we need to prioritize the production of the order considered.
+However, production has already been scheduled and re-planning it entirely is not acceptable.
+Our goal is to find modifications to the schedule,
+potentially locally adjusting the settings of the system,
+to decrease the tardiness of the target order with minimal impact on the remaining production.
 
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\section*{Contribution} \label{sec:introduction/contribution}
+\todo{example of schedule modification}
 
-\begin{itemize}
-    \item What we did
-    \item How it compares to what has already been done
-\end{itemize}
+We address this problem by considering manufacturing bottlenecks in the schedule.
+Bottlenecks represent a manufacturing constraint with little to no slack.
+Our aim is to identify those limiting constraints
+and relax them to improve the tardiness of a selected order.
+To model the manufacturing systems, we utilize an extension of the \acf{rcpsp}.
+We explore existing approaches addressing the problem
+and then develop two different methods for the problem.
+Finally, the two methods are evaluated on a set of presented problem instances.
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section*{Thesis outline} \label{sec:introduction/thesis-outline}
 
-\todo{Outline}
+In \cref{chap:problem-statement}, we introduce the problem addressed in this thesis,
+followed by a survey of the scheduling literature in \cref{chap:related-works}
+aimed to explore various existing approaches to the problem.
+In \cref{chap:solution-apporach}, we present our solution approach,
+where we design two methods for identifying bottlenecks and relaxing corresponding constraints.
+Finally, in \cref{chap:numerical-experiments}, we conduct numerical experiments to evaluate the performance
+of our proposed methods and discuss achieved results.

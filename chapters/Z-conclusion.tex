@@ -1,14 +1,39 @@
 \chapwithtoc{Conclusion} \label{chap:conclussion}
 
-\todo{Contribution}
+In this thesis, we addressed the problem of reducing the tardiness of a selected order.
+First, we formulated an extension of the standard \ac{rcpsp} to model the problem.
+We then focused on manufacturing bottlenecks,
+specifically execution-level bottlenecks in obtained schedules.
+Following the identification of such bottlenecks,
+we proposed relaxations for related resource capacity constraints.
 
-\todo{Result summary}
+% -----------------------------------------------------------------------------------------------------------
+\secwithtoc{Contribution}
 
-\todo{Further research directions}
-\begin{itemize}
-    \item
-        Sensitivity analysis was not conducted.
-        Following the work of \citet{Lawrence1994},
-        the effect of our proposed changes could be studied
-        to evaluate how the changes affect the sensitivity of the system.
-\end{itemize}
+The subject of identifying execution bottlenecks and subsequently relaxing related constraints
+has not been studied on the variant of the \acs{rcpsp} used in this thesis to model the problem at hand.
+We proposed two methods to address this problem;
+the \ac{iira}, utilizing adaptations of methods
+that address this problem in the Job-Shop scheduling problem,
+and the \ac{ssira}, designed specifically for this problem.
+We conducted numerical experiments to analyze the capabilities of the proposed methods.
+For that purpose, we designed a wide variety of problem instances
+modeling the extension of the \ac{rcpsp} used in this thesis.
+The performances of the two methods were studied on the presented problem instances.
+We concluded that both proposed methods provide a unique approach to the problem
+and neither of them can be decisively declared superior to the other.
+
+% -----------------------------------------------------------------------------------------------------------
+\secwithtoc{Further research}
+
+Sensitivity analysis was not conducted.
+Following the work of \citet{Lawrence1994},
+the effect of our proposed changes could be studied
+to evaluate how the changes affect the sensitivity of the system.
+
+The idea of relaxations focusing on the target order has proven viable for reducing the order's tardiness.
+The designed \ac{ssira} utilizing this approach was able to find improving solutions.
+In comparison to the \enquote{naive} approach of the \ac{iira}, however,
+the benefit of the focusing relaxations was not as apparent as we anticipated.
+We believe this approach can be studied further to develop methods
+which surpass general bottleneck-relaxing methods in performance.
