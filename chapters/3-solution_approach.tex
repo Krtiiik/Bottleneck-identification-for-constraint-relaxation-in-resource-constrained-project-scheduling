@@ -385,6 +385,7 @@ Following this, we can observe the potential improvements in the starting times
 and the consequent required resource capacity relaxations.
 
 \begin{defn}[Left-shift closure] \label{def:left-shift-closure}
+    Let $\Schedule = (\jobstart{1}, \dots, \jobstart{n})$ be a schedule to a problem instance $\Instance$.
     A \emph{left-shift closure} of a job $j \in \Jobs$ is the set $\closure{j}~\subseteq~\Jobs$, where:
     \begin{conditions}
         \item
@@ -421,7 +422,20 @@ and the consequent required resource capacity relaxations.
     \end{conditions}
 \end{defn}
 
-\todo{closure plot example}
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth]{img/Schedule-Closure.pdf}
+    \caption{
+        Example of a left-shift closure computed for the job 9 in the schedule given in \cref{fig:schedule}.
+        Here, the left-shift closure of the job 9 is the set $\closure{9} = \{ 3, 7, 8, 9 \}$.
+        The included jobs are highlighted; jobs not included are dimmed.
+        Job 9 is trivially included by \cref{def:closure/base}.
+        Job 8 is included by \cref{def:closure/shift-pause-precedence} --- pauses in resource working shifts.
+        Job 7 is included by \cref{def:closure/precedence} --- precedence predecessor of the job 8.
+        Job 3 is included by \cref{def:closure/resource-precedence} --- resource predecessor of the job 7 on resource 1.
+        }
+    \label{fig:schedule-closure}
+\end{figure}
 
 The left-shift closure of a job $j$ defines the set of all jobs
 preventing the job $j$ from starting in an earlier time period.
@@ -500,19 +514,7 @@ formulated in \cref{alg:find-intervals-to-relax}.
 \end{algorithm}
 
 
-The algorithm consists of a main loop (lines~\ref{alg:ssira/repeat}--\ref{alg:ssira/for-iters}),
-the input of which is a problem instance and its solution,
-the output of which is a modified problem instance and its solution.
-In each iteration of the main loop, the algorithm first finds improvement intervals (line~\ref{alg:ssira/ints}).
-Then, resource capacity functions are modified based on these intervals (line~\ref{alg:ssira/modify}).
-The subsequent steps (lines~\ref{alg:ssira/solution}--\ref{alg:ssira/additions-migrations}) mirror those of the \ac{iira},
-as stated in detail in \cref{subsec:solution-approach/baseline-solution/iira}.
-A new solution to the modified problem instance is found,
-the modified resource capacity functions are reduced based on that solution,
-and capacity migrations and additions are computed in the reduced capacity functions.
-
-
-\begin{algorithm}[b]
+\begin{algorithm}[t]
 \caption{FindIntervalsToRelax}
 \label{alg:find-intervals-to-relax}
 \begin{algorithmic}[1]
@@ -541,6 +543,19 @@ and capacity migrations and additions are computed in the reduced capacity funct
 \Outputc a set of 3-tuples $(j, s, e) \in \Jobs \times \intinterval{1}{\horizon}^2$
 \end{algorithmic}
 \end{algorithm}
+
+
+The algorithm consists of a main loop (lines~\ref{alg:ssira/repeat}--\ref{alg:ssira/for-iters}),
+the input of which is a problem instance and its solution,
+the output of which is a modified problem instance and its solution.
+In each iteration of the main loop, the algorithm first finds improvement intervals (line~\ref{alg:ssira/ints}).
+Then, resource capacity functions are modified based on these intervals (line~\ref{alg:ssira/modify}).
+The subsequent steps (lines~\ref{alg:ssira/solution}--\ref{alg:ssira/additions-migrations}) mirror those of the \ac{iira},
+as stated in detail in \cref{subsec:solution-approach/baseline-solution/iira}.
+A new solution to the modified problem instance is found,
+the modified resource capacity functions are reduced based on that solution,
+and capacity migrations and additions are computed in the reduced capacity functions.
+
 
 The \algnameref{FindIntervalsToRelax}{alg:find-intervals-to-relax} function consists of initializations,
 the search for improvement intervals, and a preference-selection of intervals.
