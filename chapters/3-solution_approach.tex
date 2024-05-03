@@ -267,6 +267,8 @@ Complete pseudocodes of the procedures are available in \cref{sec:attachments/al
         computes a granular resource load for a given resource.
         The granular load is a function mapping granular periods to the cumulative sum of the load
         of the resource over the specified granular period.
+        Example of a computed granular load can is illustrated in \cref{fig:granular-load}.
+
         \begin{figure}
             \centering
             \includegraphics[width=\textwidth]{img/GranularLoad.pdf}
@@ -275,7 +277,7 @@ Complete pseudocodes of the procedures are available in \cref{sec:attachments/al
                 The first panel illustrates the resource load representing the consumption of jobs.
                 The second panel illustrates the computed granular load with the granularity of 4 time periods.
                 }
-            \label{fig:enter-label}
+            \label{fig:granular-load}
         \end{figure}
         
     \item \algnameref{IncreaseGranularPeriodCapacity}{alg:increase-granular-period-capacity}
@@ -341,7 +343,24 @@ for focusing the search for improvement intervals towards improving the tardines
     $$
 \end{defn}
 
-\todo{example}
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{img/Schedule-Relaxed.pdf}
+    \caption{
+        Example of a suffix-relaxed schedule based on the schedule given in \cref{fig:schedule}.
+        The red vertical line represents the time period for which the suffix-relaxed schedule was computed.
+        The resource capacity constraints were relaxed for jobs 5, 6, and 9
+        as they were scheduled later than the specified time period.
+        In the suffix-relaxed schedule,
+        the start times of those jobs are constrained only by precedence constraints.
+        We observe that in the relaxed schedule,
+        job 9 would require only small capacity additions on both resources,
+        should it be scheduled on them.
+        Moreover, most of the requirements could be satisfied
+        by migrating unused capacities between the resources.
+        }
+    \label{fig:schedule-relaxed}
+\end{figure}
 
 For a given job $j$, the value of $\relaxedjobstart{t}{j}$
 depends only on the values $\relaxedjobstart{t}{i}$ of its precedence predecessors $i$,
