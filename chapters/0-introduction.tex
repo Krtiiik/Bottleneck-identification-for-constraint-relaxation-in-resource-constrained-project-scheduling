@@ -26,7 +26,8 @@ of a selected order in an existing production schedule.
 Upon obtaining a schedule constructed to meet all the extensive production demands,
 we observe that a particular order is overly tardy with respect to its deadline.
 We would like to obtain a modified schedule which reduces the tardiness of that order
-while not differing from the original schedule much.
+while not differing from the original schedule much,
+as shown in \cref{fig:schedule-change}.
 This corresponds to a scenario where, for example, after a discussion with the intended customer,
 we need to prioritize the production of the order considered.
 However, production has already been scheduled and re-planning it entirely is not acceptable.
@@ -34,9 +35,17 @@ Our goal is to find modifications to the schedule,
 potentially locally adjusting the settings of the system,
 to decrease the tardiness of the target order with minimal impact on the remaining production.
 
-
-
-\todo{example of schedule modification}
+\begin{figure}[b]
+    \centering
+    \includegraphics[width=0.6\textwidth]{img/Schedule-Change.pdf}
+    \caption{
+        Schedule modification example.
+        The green highlighted job is overly tardy with respect to its deadline (vertical dotted line).
+        In the modified schedule, it is shifted to an earlier time,
+        while the red jobs need to be shifted to a later time.
+        }
+    \label{fig:schedule-change}
+\end{figure}
 
 We achieve this by considering manufacturing bottlenecks in the schedule,
 related to specific manufacturing constraints.
