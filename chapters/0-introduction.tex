@@ -26,8 +26,7 @@ of a selected order in an existing production schedule.
 Upon obtaining a schedule constructed to meet all the extensive production demands,
 we observe that a particular order is overly tardy with respect to its deadline.
 We would like to obtain a modified schedule which reduces the tardiness of that order
-while not differing from the original schedule much,
-as shown in \cref{fig:schedule-change}.
+while not differing from the original schedule much.
 This corresponds to a scenario where, for example, after a discussion with the intended customer,
 we need to prioritize the production of the order considered.
 However, production has already been scheduled and re-planning it entirely is not acceptable.
@@ -35,26 +34,39 @@ Our goal is to find modifications to the schedule,
 potentially locally adjusting the settings of the system,
 to decrease the tardiness of the target order with minimal impact on the remaining production.
 
-\begin{figure}
+We achieve this by considering manufacturing bottlenecks in the schedule,
+related to specific manufacturing constraints.
+Our aim is to identify these limiting constraints
+and relax them to improve the tardiness of a selected order.
+Following the relaxation, we obtain a modified schedule and compare the improvements.
+An example of such a modification is illustrated in \cref{fig:schedule-change}.
+
+To model the problem at hand, we use an extension of the \acf{rcpsp}
+that introduces time-variant resource capacities.
+We develop two different methods to address the problem.
+The first method adapts existing approaches from the literature,
+which, however, address the problem in simplified scheduling models.
+We first need to adapt the approaches to our problem.
+The seconds method is developed specifically to address the problem.
+This method utilizes relaxations which focus specifically on the target order.
+Lastly, we present a set of problem instances designed to model the scheduling problem
+and we evaluate the two methods using the presented problem instance set.
+
+\begin{figure}[tb]
     \centering
-    \includegraphics[width=0.8\textwidth]{img/Schedule-Change.pdf}
+    \includegraphics[width=\textwidth]{img/Schedule-Change.pdf}
     \caption{
         Schedule modification example.
-        The green highlighted job is overly tardy with respect to its deadline (vertical dotted line).
-        It could not have been scheduled earlier due to lack of remaining capacity on the resource.
-        In the modified schedule, the capacity of the resource is increased 
+        The green highlighted job is overly tardy with respect to its deadline (indicated by the vertical dotted line).
+        It could not have been scheduled earlier due to the lack of remaining capacity on the resource.
+        The resource capacity is increased within the minimal required time interval
+        for the tardy job to be scheduled earlier.
+        By temporarily increasing the resource capacity,
+        we achieved improvement in the tardiness of the highlighted job,
+        as it was possible to schedule it earlier.
         }
     \label{fig:schedule-change}
 \end{figure}
-
-We achieve this by considering manufacturing bottlenecks in the schedule,
-related to specific manufacturing constraints.
-Our aim is to identify those limiting constraints
-and relax them to improve the tardiness of a selected order.
-To model the manufacturing systems, we utilize an extension of the \acf{rcpsp}.
-We explore existing approaches addressing the problem
-and then develop two different methods for the problem.
-Finally, the two methods are evaluated on a set of presented problem instances.
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section*{Thesis outline} \label{sec:introduction/thesis-outline}
