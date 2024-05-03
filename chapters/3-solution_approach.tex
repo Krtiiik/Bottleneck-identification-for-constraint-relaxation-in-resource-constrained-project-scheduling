@@ -5,12 +5,14 @@ we present two algorithms designed for identifying and relaxing bottlenecks in t
 Both algorithms aim to improve the tardiness of a selected order
 by introducing relaxations to the capacity constraints in the problem instance
 and finding a solution to the modified problem instance.
+
 First, we propose an algorithm called \acf{iira}.
 The \ac{iira} combines an adaptation of existing bottleneck identification approaches from the literature
 with a new method for relaxing the capacity constraints.
 The algorithm utilizes bottleneck identification indicators to find bottleneck resources,
 selects periods with high improvement potential,
 and increases the capacities of the bottleneck resources during the selected periods.
+
 The second algorithm we propose is the \acf{ssira}.
 The \ac{ssira} employs a novel approach to relaxing capacity constraints
 based on finding improvement intervals in partially relaxed versions of the problem.
@@ -19,7 +21,24 @@ and selects jobs that could start earlier following the relaxation.
 The resource capacity constraints are then relaxed with respect to a small subset
 of the selected jobs with improvement potential.
 
-\todo{running example for the algorithms}
+To help explain how the algorithms work,
+we illustrate\footnote{
+    The figures used to illustrate the specifics of the algorithms were created in Python
+    using the plotting library Matplotlib. See online at \url{https://matplotlib.org/}.
+}
+key moments on the schedule given in \cref{fig:example/base}.
+In the illustrated schedule, job 9 is scheduled past its due date and is considered tardy.
+This job is the target order for improvements in the examples provided for the algorithms.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{img/example_solution_base.pdf}
+    \caption{
+        Computed example schedule.
+        Job 9 is considered tardy as it is scheduled past its due date (time period 22).
+        }
+    \label{fig:example/base}
+\end{figure}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Baseline solution} \label{sec:solution-apporach/baseline-solution}
@@ -205,6 +224,33 @@ the input of which is a problem instance and its solution,
 the output of which is a modified problem instance and its solution.
 We describe the individual steps performed by the algorithm in the following outline.
 
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.85\textwidth]{img/example_solution_iira_intermediate.pdf}
+    \caption{
+        Computed example of an intermediate schedule obtained by the \ac{iira}
+        ($\algIndicator = \indAUAU{}, \algGranularity = 8, \algConvolution = \convAround, \algMaxiter = 1, \algMaxperiods = 1, \algImprovement = 8$).
+        The capacity of resource 2 is increased during the granular period
+        spanning over time periods $\intinterval{24}{31}$.
+        Subsequently, job 9 can be scheduled earlier.
+        The newly introduced capacity utilized by the job 9 is highlighted.
+    }
+    \label{fig:example/iira-step}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.85\textwidth]{img/example_solution_iira.pdf}
+    \caption{
+        Computed example of a schedule with reduced resource capacity functions obtained by the \ac{iira}
+        ($\algIndicator = \indAUAU{}, \algGranularity = 8, \algConvolution = \convAround, \algMaxiter = 1, \algMaxperiods = 1, \algImprovement = 8$).
+        The capacity of resource 2 is reduced during the granular period
+        spanning over time periods $\intinterval{24}{31}$ to exclude unused capacity additions.
+        The only additional capacity left is exactly the highlighted capacity consumed by the job 9.
+    }
+    \label{fig:example/iira-reduced}
+\end{figure}
+
 \begin{steps}
     \item
     First, the solution is evaluated using the given identification indicator
@@ -241,9 +287,11 @@ We describe the individual steps performed by the algorithm in the following out
 
     \item
     Finally, a new solution to the modified problem instance is found (line~\ref{alg:iira/modified-solution}).
+    An example of a modified solution is given in \cref{fig:example/iira-step}.
     Based on this solution,
     reduced capacity functions are computed to exclude capacity relaxations
     not utilized in the solution (line~\ref{alg:iira/reduction}).
+    An example of a schedule with reduced resource capacity functions is given in \cref{fig:example/iira-reduced}.
     The reduction involves the capacity functions of all the resources, not only of the bottleneck resource.
     This is because, in subsequent iterations of the algorithm,
     the introduction of new relaxations often leads to changes in the solution schedule.
@@ -269,9 +317,9 @@ Complete pseudocodes of the procedures are available in \cref{sec:attachments/al
         of the resource over the specified granular period.
         Example of a computed granular load can is illustrated in \cref{fig:granular-load}.
 
-        \begin{figure}
+        \begin{figure}[bt]
             \centering
-            \includegraphics[width=\textwidth]{img/GranularLoad.pdf}
+            \includegraphics[width=0.85\textwidth]{img/GranularLoad.pdf}
             \caption{
                 Resource granular load example.
                 The first panel illustrates the resource load representing the consumption of jobs.
@@ -302,8 +350,6 @@ Complete pseudocodes of the procedures are available in \cref{sec:attachments/al
         Then, when no other migrations are possible, the remaining capacity requirements are fulfilled
         by introducing capacity additions.
 \end{itemize}
-
-\todo{REVISION of algorithms}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Extended solution} \label{sec:solution-apporach/extended-solution}
@@ -342,25 +388,6 @@ for focusing the search for improvement intervals towards improving the tardines
     \end{cases}
     $$
 \end{defn}
-
-\begin{figure}
-    \centering
-    \includegraphics[width=\textwidth]{img/Schedule-Relaxed.pdf}
-    \caption{
-        Example of a suffix-relaxed schedule based on the schedule given in \cref{fig:schedule}.
-        The red vertical line represents the time period for which the suffix-relaxed schedule was computed.
-        The resource capacity constraints were relaxed for jobs 5, 6, and 9
-        as they were scheduled later than the specified time period.
-        In the suffix-relaxed schedule,
-        the start times of those jobs are constrained only by precedence constraints.
-        We observe that in the relaxed schedule,
-        job 9 would require only small capacity additions on both resources,
-        should it be scheduled on them.
-        Moreover, most of the requirements could be satisfied
-        by migrating unused capacities between the resources.
-        }
-    \label{fig:schedule-relaxed}
-\end{figure}
 
 For a given job $j$, the value of $\relaxedjobstart{t}{j}$
 depends only on the values $\relaxedjobstart{t}{i}$ of its precedence predecessors $i$,
@@ -422,21 +449,6 @@ and the consequent required resource capacity relaxations.
     \end{conditions}
 \end{defn}
 
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=\textwidth]{img/Schedule-Closure.pdf}
-    \caption{
-        Example of a left-shift closure computed for the job 9 in the schedule given in \cref{fig:schedule}.
-        Here, the left-shift closure of the job 9 is the set $\closure{9} = \{ 3, 7, 8, 9 \}$.
-        The included jobs are highlighted; jobs not included are dimmed.
-        Job 9 is trivially included by \cref{def:closure/base}.
-        Job 8 is included by \cref{def:closure/shift-pause-precedence} --- pauses in resource working shifts.
-        Job 7 is included by \cref{def:closure/precedence} --- precedence predecessor of the job 8.
-        Job 3 is included by \cref{def:closure/resource-precedence} --- resource predecessor of the job 7 on resource 1.
-        }
-    \label{fig:schedule-closure}
-\end{figure}
-
 The left-shift closure of a job $j$ defines the set of all jobs
 preventing the job $j$ from starting in an earlier time period.
 The only exception to this interpretation is the \cref{def:closure/base},
@@ -463,6 +475,40 @@ it could not have been scheduled at the end of the previous working shift
 due to the lack of remaining capacities on its required resources.
 Jobs scheduled at the end of the previous working shift consume the required resources
 and thus prevent the job $j$ from being scheduled there.
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.7\textwidth]{img/Schedule-Relaxed.pdf}
+    \caption{
+        Example of a suffix-relaxed schedule based on the schedule given in \cref{fig:schedule}.
+        The red vertical line represents the time period for which the suffix-relaxed schedule was computed.
+        The resource capacity constraints were relaxed for jobs 5, 6, and 9
+        as they were scheduled later than the specified time period.
+        In the suffix-relaxed schedule,
+        the start times of those jobs are constrained only by precedence constraints.
+        We observe that in the relaxed schedule,
+        job 9 would require only small capacity additions on both resources,
+        should it be scheduled on them.
+        Moreover, most of the requirements could be satisfied
+        by migrating unused capacities between the resources.
+        }
+    \label{fig:schedule-relaxed}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.7\textwidth]{img/Schedule-Closure.pdf}
+    \caption{
+        Example of a left-shift closure computed for the job 9 in the schedule given in \cref{fig:schedule}.
+        Here, the left-shift closure of the job 9 is the set $\closure{9} = \{ 3, 7, 8, 9 \}$.
+        The included jobs are highlighted; jobs not included are dimmed.
+        Job 9 is trivially included by \cref{def:closure/base}.
+        Job 8 is included by \cref{def:closure/shift-pause-precedence} --- pauses in resource working shifts.
+        Job 7 is included by \cref{def:closure/precedence} --- precedence predecessor of the job 8.
+        Job 3 is included by \cref{def:closure/resource-precedence} --- resource predecessor of the job 7 on resource 1.
+        }
+    \label{fig:schedule-closure}
+\end{figure}
 
 % -----------------------------------------------------------------------------------------------------------
 \subsection{Schedule Suffix Interval Relaxing Algorithm} \label{subsec:extended-solution/schedule-suffix-interal-relaxing-algorithm}
@@ -544,6 +590,34 @@ formulated in \cref{alg:find-intervals-to-relax}.
 \end{algorithmic}
 \end{algorithm}
 
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.85\textwidth]{img/example_solution_ssira_intermediate.pdf}
+    \caption{
+        Computed example of an intermediate schedule obtained by the \ac{ssira}
+        ($\algMaxiter = 1, \algMaxintervals = 1, \algSortkey = \algSortkeyTime$).
+        The capacity of resource 2 is increased over the improvement interval
+        spanning the time periods $\intinterval{22}{27}$.
+        Subsequently, job 9 can be scheduled earlier.
+        The newly introduced capacity utilized by the job 9 is highlighted.
+        Note that the job 9 is scheduled earlier than anticipated by the improvement interval.
+    }
+    \label{fig:example/ssira-step}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.85\textwidth]{img/example_solution_ssira.pdf}
+    \caption{
+        Computed example of a schedule with reduced resource capacity functions obtained by the \ac{ssira}
+        ($\algMaxiter = 1, \algMaxintervals = 1, \algSortkey = \algSortkeyTime$).
+        The capacity of resource 2 is reduced,
+        removing unused capacities introduced in \cref{fig:example/ssira-step}
+        The only additional capacity left is exactly the highlighted capacity consumed by the job 9.
+        Note that this schedule is identical to the schedule obtained by the \ac{iira} in \cref{fig:example/iira-reduced}.
+    }
+    \label{fig:example/ssira-reduced}
+\end{figure}
 
 The algorithm consists of a main loop (lines~\ref{alg:ssira/repeat}--\ref{alg:ssira/for-iters}),
 the input of which is a problem instance and its solution,
@@ -555,7 +629,10 @@ as stated in detail in \cref{subsec:solution-approach/baseline-solution/iira}.
 A new solution to the modified problem instance is found,
 the modified resource capacity functions are reduced based on that solution,
 and capacity migrations and additions are computed in the reduced capacity functions.
-
+An example of a schedule obtained in the modified instance is given in \cref{fig:example/ssira-step}
+and that schedule with reduced capacity functions is given in \cref{fig:example/ssira-reduced}.
+Note that in this example, both the \ac{ssira} and the \ac{iira} obtained the same solution,
+given in \cref{fig:example/ssira-reduced} and \cref{fig:example/iira-reduced} respectively.
 
 The \algnameref{FindIntervalsToRelax}{alg:find-intervals-to-relax} function consists of initializations,
 the search for improvement intervals, and a preference-selection of intervals.

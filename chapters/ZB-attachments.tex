@@ -77,7 +77,7 @@
             \State \textbf{break} \Comment Remaining $c$ will be fulfilled by capacity additions
         \EndIf
         \State $c_\text{mig} \gets \min(c, c_{k_\text{from}})$
-        \State Reduce surplus $\capacityf{k_{\text{from}}}^\oplus$ by $c_{\text{mig}}$ during time periods $\intinterval{s}{e}$
+        \State Reduce surplus $\capacityf{k_{\text{from}}}^\oplus$ by $c_{\text{mig}}$ during time periods $\intinterval{s}{e-1}$
         \State $\Migrations \gets \Migrations \cup \{ \migration{k_\text{from}}{k}{s}{e}{c_{\text{mig}}} \}$
     \EndWhile
 \EndFor
@@ -123,9 +123,9 @@
     \State $\closure{j} \gets \closure{j} \cup \{ i \}$
     \State $Q \gets Q \cup \{ p : \precedence{p}{i}, \jobend{p} = \jobstart{i}\}$
         \Comment Precedence predecessors
-    \State $Q \gets Q \cup \bigcup_{k: \consumption{j}{k} > 0}\{ p \in \JobsOnResource{k} : \jobend{p} = \jobstart{i} \}$
+    \State $Q \gets Q \cup \bigcup_{k: \consumption{i}{k} > 0}\{ p \in \JobsOnResource{k} : \jobend{p} = \jobstart{i} \}$
         \Comment Resource predecessors
-    \For {$k \in \Resources, \consumption{j}{k} > 0, \capacity{k}{\jobstart{i}-1} = 0$}
+    \For {$k \in \Resources, \consumption{i}{k} > 0, \capacity{k}{\jobstart{i}-1} = 0$}
         \Comment Resource-pause predecessors
         \State $\mathrm{ps}_k(\jobstart{i}) \gets \max\{t^\prime \in \intinterval{1}{\jobstart{i}-1} : \capacity{k}{t^\prime} > 0\}$
         \State $Q \gets Q \cup \{ p \in \JobsOnResource{k} : \mathrm{ps}_k(\jobstart{i}) - \duration{i} \leq \jobend{p} \leq \mathrm{ps}_k(\jobstart{i}) \}$
