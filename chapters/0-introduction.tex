@@ -21,7 +21,8 @@ which undoubtedly plays an important role in making decisions.
 This leads to users of the \ac{aps} software to plan production by iteratively
 scheduling and fine-tuning settings to obtain an acceptable schedule.
 
-In this thesis, we address the problem of reducing the tardiness of a selected order.
+In this thesis, we address the problem of reducing the tardiness
+of a selected order in an existing production schedule.
 Upon obtaining a schedule constructed to meet all the extensive production demands,
 we observe that a particular order is overly tardy with respect to its deadline.
 We would like to obtain a modified schedule which reduces the tardiness of that order
@@ -33,10 +34,12 @@ Our goal is to find modifications to the schedule,
 potentially locally adjusting the settings of the system,
 to decrease the tardiness of the target order with minimal impact on the remaining production.
 
+
+
 \todo{example of schedule modification}
 
-We address this problem by considering manufacturing bottlenecks in the schedule.
-Bottlenecks represent a manufacturing constraint with little to no slack.
+We achieve this by considering manufacturing bottlenecks in the schedule,
+related to specific manufacturing constraints.
 Our aim is to identify those limiting constraints
 and relax them to improve the tardiness of a selected order.
 To model the manufacturing systems, we utilize an extension of the \acf{rcpsp}.
@@ -52,5 +55,7 @@ followed by a survey of the scheduling literature in \cref{chap:related-works}
 aimed to explore various existing approaches to the problem.
 In \cref{chap:solution-apporach}, we present our solution approach,
 where we design two methods for identifying bottlenecks and relaxing corresponding constraints.
-Finally, in \cref{chap:numerical-experiments}, we conduct numerical experiments to evaluate the performance
+In \cref{chap:numerical-experiments}, we conduct numerical experiments to evaluate the performance
 of our proposed methods and discuss achieved results.
+In the last chapter, we conclude the thesis by summarizing achieved results
+and proposing directions for future work.
