@@ -35,12 +35,14 @@ Our goal is to find modifications to the schedule,
 potentially locally adjusting the settings of the system,
 to decrease the tardiness of the target order with minimal impact on the remaining production.
 
-\begin{figure}[b]
+\begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{img/Schedule-Change.pdf}
+    \includegraphics[width=0.8\textwidth]{img/Schedule-Change.pdf}
     \caption{
         Schedule modification example.
         The green highlighted job is overly tardy with respect to its deadline (vertical dotted line).
+        It could not have been scheduled earlier due to lack of remaining capacity on the resource.
+        In the modified schedule, the capacity of the resource is increased 
         }
     \label{fig:schedule-change}
 \end{figure}
