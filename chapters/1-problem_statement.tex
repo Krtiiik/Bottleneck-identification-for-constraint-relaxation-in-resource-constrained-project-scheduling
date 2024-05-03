@@ -20,9 +20,9 @@ All following definitions and values are assumed to be in the integer domain.
 A \emph{problem instance} $\Instance$ is defined as a 4-tuple $(\Jobs, \Precedences, \Resources, \horizon)$,
 where
 \begin{itemize}
-    \item $\Jobs = \{1, \dots, n\}$ is a set of \emph{jobs},
-    \item $\Precedences$ is a set of all \emph{precedences} constraints,
-    \item $\Resources = \{1, \dots, m\}$ is a set of \emph{resources},
+    \item $\Jobs = \{1, \dots, n\}$ is the set of \emph{jobs},
+    \item $\Precedences$ is the set of all \emph{precedences} constraints,
+    \item $\Resources = \{1, \dots, m\}$ is the set of \emph{resources},
     \item $\horizon$ is the time horizon of the problem instance.
 \end{itemize}
 \end{defn}
@@ -55,7 +55,7 @@ describing the amount of time needed to process the job $j$.
 \emph{Preemption} of jobs is not allowed in any form
 --- the execution of a job cannot be interrupted after its start,
 not even at the ends of working shifts (see variable resource capacities below).
-Each job $j$ also has a \emph{due date} $\deadline{j}$,
+Each job $j$ also has a \emph{due date}~$\deadline{j}$,
 stating a time horizon in which the job should be completed;
 otherwise, it is considered \emph{tardy}.
 Subsequently, each job $j$ also has a \emph{tardiness weight} $\tardinessweight{j}$
@@ -295,13 +295,13 @@ would likely still be assigned to that that resource during a different time per
 
 We associate a capacity addition with the 4-tuple $\addition{k}{s}{e}{c}$, where
 $k$ is the resource whose capacity is increased,
-$s$ and $e$ form the time interval $\intinterval{s}{e}$ over which the addition is executed, and
+$s$ and $e$ form the time interval $\intinterval{s}{e-1}$ over which the addition is executed, and
 $c$ is the added capacity.
 Analogously, we associate a capacity migration
 with the 5-tuple $\migration{k_{\text{from}}}{k_{\text{to}}}{s}{e}{c}$, where
 $k_{\text{from}}$ is the source resource whose capacity is lowered,
 $k_{\text{to}}$ is the target resource whose capacity is increased,
-$s$ and $e$ form the time interval $\intinterval{s}{e}$ over which the migration is executed, and
+$s$ and $e$ form the time interval $\intinterval{s}{e-1}$ over which the migration is executed, and
 $c$ is the migrated capacity.
 For a modified instance $\Instance^*$, the sets of all migrations and additions are denoted as
 $\Migrations^{\Instance^*}$ and $\Additions^{\Instance^*}$, respectively.

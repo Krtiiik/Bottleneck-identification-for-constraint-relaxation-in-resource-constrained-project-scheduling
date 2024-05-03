@@ -3,9 +3,10 @@
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{\acs{rcpsp} scheduling} \label{sec:related-works/scheduling-the-rcpsp}
 
-The \ac{rcpsp} is proven to be NP-hard \citep{Blazewicz1983}.
-A comprehensive overview of complexity results was done by \citet{Ganian2021}.
 To model our studied problem we chose the \Problem{} version of the \ac{rcpsp}.
+The standard \ac{rcpsp} is proven to be NP-hard \citep{Blazewicz1983}.
+A comprehensive overview of complexity results was done by \citet{Ganian2021}.
+
 % -----------------------------------------------------------------------------------------------------------
 \subsection{Time-variable resource capacity constraints} \label{subsec:related-works/scheduling-the-rcpsp/time-variable-resource-capacity-constraints}
 
@@ -26,7 +27,7 @@ Usually, only a specific form of preemption is allowed ---
 interrupting the execution of a job at the end of a working shift
 and resuming it at the start of the following working shift.
 Preemption in this context can be a reasonable assumption as it can,
-in some manufacturing processes, correspond to a simple interruption in executed work.
+in some manufacturing systems, correspond to a simple interruption in executed work.
 On the other hand, job preemption, even in the specific form mentioned,
 might not be available due to technical reasons.
 

@@ -1,9 +1,8 @@
 \chapwithtoc{Notation} \label{sec:notation}
 
-\todo{Additional entries}
-\begin{table}[h!]
+\begin{table}[!ht]
     \centering
-    \begin{tabularx}{\textwidth}{lX}
+    \begin{tabularx}{\textwidth}{p{0.38\textwidth}p{0.6\textwidth}}
         \textbf{Symbol} & \textbf{Definition} \\
         \hline
         \\
@@ -51,5 +50,32 @@
 
         \tablenote{2}{supper-scripting a value with a schedule symbol --- for example
         $\jobend{j}^{\Schedule}$ --- relates that value to the specified schedule.} \\
+    \end{tabularx}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{p{0.38\textwidth}p{0.6\textwidth}}
+        \textbf{Symbol} & \textbf{Definition} \\
+        \hline
+        \\
+
+        \textbf{\acs{iira} parameters}  & \cellrule \\
+        $\algIndicator$ & Identification indicator \\
+        $\algGranularity$ & Granular period granularity \\
+        $\algConvolution$ & Improvement potential convolution kernel \\
+        $\convPre, \convAround, \convPost$ & Various improvement potential convolution kernels \\
+        $\algMaxiter$ & Iterations limit \\
+        $\algMaxperiods$ & Improvement periods limit \\
+        $\algImprovement$ & Capacity improvement \\
+        \\
+
+        \textbf{\acs{ssira} parameters} & \cellrule \\
+        $\algMaxiter$ & Iterations limit \\
+        $\algMaxintervals$ & Improvement intervals limit \\
+        $\algSortkey$ & Interval sort key \\
+        $\algSortkeyTime$ & Interval sort key sorting by interval time periods \\
+        $\algSortkeyImprovement$ & Interval sort key sorting by interval proposed improvement \\
+        \\
     \end{tabularx}
 \end{table}
