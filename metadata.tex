@@ -44,24 +44,40 @@
 % An optional dedication: you can thank whomever you wish (your supervisor,
 % consultant, who provided you with tea and pizza, etc.)
 \def\Dedication{%
-\xxx{Dedication.}
+I would like to express my gratitude to my supervisor, RNDr.~Jiří~Švancara,~Ph.D., for his kind guidance,
+and to Ing.~Antonín~Novák,~Ph.D., for the numerous invaluable consultations on the subject.
+
+I would also like to thank my family for their continuous support throughout my studies.
+
+Finally, I wish to acknowledge my debugging ducks for their supportive presence during the writing process.
 }
 
 % Abstract (recommended length around 80-200 words; this is not a copy of your thesis assignment!)
 \def\Abstract{%
-\xxx{Use the most precise, shortest sentences that state what problem the
-thesis addresses, how it is approached, pinpoint the exact result achieved, and
-describe the applications and significance of the results. Highlight anything
-novel that was discovered or improved by the thesis. Maximum length is 200
-words, but try to fit into 120. Abstracts are often used for deciding if
-a reviewer will be suitable for the thesis; a well-written abstract thus
-increases the probability of getting a reviewer who will like the thesis.}
+In modern manufacturing systems, production planners create schedules
+by iteratively obtaining proposed schedules and adjusting input parameters
+to satisfy multiple, often competing, optimization goals.
+The goal of this thesis is to address the problem
+of reducing the tardiness of a particular order in an obtained schedule,
+which is a practical problem commonly arising in production scheduling.
+We do this by identifying bottlenecks in the schedule
+and proposing relaxations to constraints related to the identified bottlenecks.
+We develop two methods for this purpose.
+The first method adapts existing approaches from the scheduling literature and proposes general relaxations.
+The second method identifies potential improvements in relaxed versions of the problem
+and proposes relaxations targeting the specific order.
+To evaluate the performance of the methods,
+we present a set of problem instances modeling the addressed problem
+and conduct numerical experiments.
 }
 
 % 3 to 5 keywords (recommended) separated by \sep
 % Keywords are useful for indexing and searching for the theses by topic.
 \def\ThesisKeywords{%
-\xxx{keyword\sep key phrase}
+scheduling\sep%
+resource-constrained scheduling\sep%
+bottlenecks\sep%
+constraint relaxation
 }
 
 % If any of your metadata strings contains TeX macros, you need to provide
@@ -74,8 +90,8 @@ increases the probability of getting a reviewer who will like the thesis.}
 
 % If your abstracts are long and do not fit in the infopage, you can make the
 % fonts a bit smaller by this setting. (Also, you should try to compress your abstract more.)
-\def\InfoPageFont{}
-%\def\InfoPageFont{\small}  % uncomment to decrease font size
+% \def\InfoPageFont{}
+\def\InfoPageFont{\small}  % uncomment to decrease font size
 
 % If you are studing in a Czech programme, you also need to provide metadata in Czech:
 % (in English programmes, this is not used anywhere)
@@ -87,9 +103,24 @@ increases the probability of getting a reviewer who will like the thesis.}
 \def\StudyProgrammeCS{Informatika (B0613A140006)}
 
 \def\ThesisKeywordsCS{%
-\xxx{klíčová slova\sep klíčové fráze}
+plánování výroby\sep%
+plánování výroby s omezenými zdroji\sep%
+úzká hrdla\sep%
+relaxování omezujících podmínek
 }
 
 \def\AbstractCS{%
-\xxx{Abstrakt práce přeložte také do češtiny.}
+Plánovači výroby často sestavují rozvrh výroby pomocí plánovacích nástrojů.
+Iterovavaným získáváním návrhů na rozvrh a úpravami vstupních parametrů
+se snaží vyhovět mnohým, často protichůdným, optimalizačním cílům.
+Cílem této práce je zaměřit se na problém snižování zpoždění, tzv. tardiness, vybrané zakázky v obdrženém rozvrhu,
+jakožto běžně řešený problém při plánování výroby.
+Zaměříme se na identifikaci tzv. úzkých hrdel daných rozvrhů
+za účelem relaxace omezujících podmínek souvisejících s identifikovanými úzkými hrdly.
+Pro tento účel představíme dvě metody.
+První metoda adaptuje existující přístupy z literatury v kombinaci s návrhy obecných relaxací podmínek.
+Druhá metoda identifikuje potenciální zlepšení v relaxovaných verzích problému
+a navrhuje relaxace zaměřující se na konkrétní zpožděnou zakázku.
+Pro zhodnocení výkonu představených metod vytvoříme sadu instancí modelujících daný problém
+a provedeme numerické experimenty.
 }
