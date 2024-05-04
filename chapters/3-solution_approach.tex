@@ -129,8 +129,8 @@ $$
 For a resource $k$,
 $(a_{k1}^{S}, a_{k1}^{E}), \dots, (a_{kA_k}^{S}, a_{kA_k}^{E})$
 is the the sequence of \emph{uninterrupted active periods},
-where $a_{ki}^{S} \in \intinterval{1}{\horizon}$ denotes the start of the period $i$
-and $a_{ki}^{E} \in \intinterval{1}{\horizon}$ denotes the end of the period $i$.
+where $a_{ki}^{S} \in \intinterval{1}{\horizon-1}$ denotes the start of the period $i$
+and $a_{ki}^{E} \in \intinterval{a_{ki}^{S}+1}{\horizon}$ denotes the end of the period $i$.
 Similar to the definition of \ac{auad} but with differences induced by non-unit capacities,
 an uninterrupted active period is a maximal set (maximal in terms of inclusion)
 of jobs scheduled consecutively or in parallel with no idle time
@@ -261,11 +261,11 @@ We describe the individual steps performed by the algorithm in the following out
     The granular load of the bottleneck resource is computed
     and the improvement potentials for granular periods are computed
     using convolution (lines~\ref{alg:iira/granular-load} and~\ref{alg:iira/convolution}).
-    The granular load of a resource indicates how the resource is being utilized during granular periods.
+    The granular load of a resource indicates how is the resource being utilized during granular periods.
     High utilization could indicate a potential bottleneck.
     However, it is uncertain whether the bottleneck occurs in the highly-utilized granular period,
     or whether the high utilization is a consequence of a bottleneck
-    in a preceding or following granular period.
+    in a preceding or a following granular period.
     This is why the granular load is convolved with a kernel function of choice,
     which propagates the information about high resource utilization
     to consecutive granular periods.
@@ -317,7 +317,7 @@ Complete pseudocodes of the procedures are available in \cref{sec:attachments/al
         of the resource over the specified granular period.
         Example of a computed granular load can is illustrated in \cref{fig:granular-load}.
 
-        \begin{figure}[bt]
+        \begin{figure}[hbt]
             \centering
             \includegraphics[width=0.85\textwidth]{img/GranularLoad.pdf}
             \caption{
@@ -363,8 +363,6 @@ corresponding to the selected improvement intervals are relaxed.
 The primary goal is to identify relaxations that focus specifically on the target order.
 By doing so, we hope to achieve great improvements in the tardiness of the target order
 while maintaining low capacity modification costs and induced schedule differences.
-In doing so, we aim to improve the tardiness of the target order
-while keeping capacity modification costs and the induced schedule differences to a minimum.
 
 % -----------------------------------------------------------------------------------------------------------
 \subsection{Preliminaries} \label{subsec:solution-approach/extended-solutin/preliminaries}
@@ -384,7 +382,7 @@ for focusing the search for improvement intervals towards improving the tardines
     $$
     \relaxedjobstart{t}{j} \defeq \begin{cases}
         \jobstart{j} & \text{if $\jobstart{j} \leq t$;} \\
-        \max\left\{\relaxedjobstart{t}{j} : \precedence{i}{j} \in \Precedences \right\} & \text{otherwise.}
+        \max\left\{\relaxedjobstart{t}{i} + \duration{i}: \precedence{i}{j} \in \Precedences \right\} & \text{otherwise.}
     \end{cases}
     $$
 \end{defn}
@@ -500,12 +498,12 @@ and thus prevent the job $j$ from being scheduled there.
     \includegraphics[width=0.7\textwidth]{img/Schedule-Closure.pdf}
     \caption{
         Example of a left-shift closure computed for the job 9 in the schedule given in \cref{fig:schedule}.
-        Here, the left-shift closure of the job 9 is the set $\closure{9} = \{ 3, 7, 8, 9 \}$.
+        Here, the left-shift closure of the job 9 is the set $\closure{9} = \{ 2, 3, 8, 9 \}$.
         The included jobs are highlighted; jobs not included are dimmed.
         Job 9 is trivially included by \cref{def:closure/base}.
         Job 8 is included by \cref{def:closure/shift-pause-precedence} --- pauses in resource working shifts.
-        Job 7 is included by \cref{def:closure/precedence} --- precedence predecessor of the job 8.
-        Job 3 is included by \cref{def:closure/resource-precedence} --- resource predecessor of the job 7 on resource 1.
+        Job 2 is included by \cref{def:closure/resource-precedence} --- resource predecessor of the job 8 on resource 1.
+        Job 3 is included by \cref{def:closure/precedence} --- precedence predecessor of the job 8.
         }
     \label{fig:schedule-closure}
 \end{figure}
