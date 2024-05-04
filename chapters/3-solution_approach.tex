@@ -498,12 +498,12 @@ and thus prevent the job $j$ from being scheduled there.
     \includegraphics[width=0.7\textwidth]{img/Schedule-Closure.pdf}
     \caption{
         Example of a left-shift closure computed for the job 9 in the schedule given in \cref{fig:schedule}.
-        Here, the left-shift closure of the job 9 is the set $\closure{9} = \{ 2, 3, 8, 9 \}$.
+        Here, the left-shift closure of the job 9 is the set $\closure{9} = \{ 2, 8, 9 \}$.
         The included jobs are highlighted; jobs not included are dimmed.
         Job 9 is trivially included by \cref{def:closure/base}.
         Job 8 is included by \cref{def:closure/shift-pause-precedence} --- pauses in resource working shifts.
-        Job 2 is included by \cref{def:closure/resource-precedence} --- resource predecessor of the job 8 on resource 1.
-        Job 3 is included by \cref{def:closure/precedence} --- precedence predecessor of the job 8.
+        Job 2 is included by \cref{def:closure/resource-precedence} --- resource predecessor of the job 8 on resource 2.
+        Conversely, job 3 ends the same time period job 2 start --- however, they are not linked with a precedence constraint.
         }
     \label{fig:schedule-closure}
 \end{figure}
