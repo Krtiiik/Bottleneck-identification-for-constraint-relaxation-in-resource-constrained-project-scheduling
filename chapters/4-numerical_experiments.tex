@@ -1,17 +1,25 @@
 \chapter{Numerical experiments} \label{chap:numerical-experiments}
 
+In this chapter,
+we evaluate the performances of the \acl{iira} and the \acl{ssira} proposed in the previous chapter.
+We first design benchmark instances that model the addressed problem
+and choose ranges of parameters for each algorithm,
+creating evaluation parameter sets.
+Then, we conduct the experiments, make several observations about the outcomes,
+and discuss the achieved results.
+
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Setup} \label{sec:numerical-experiments/setup}
 
 In this section, we present benchmark instances used for evaluating the proposed methods and algorithms,
 we describe the modification process for creating problem instances suited to our studied problem,
 explain how we obtain (near) optimal solutions to the modeled problem using a constraint programming solver,
-and discuss algorithms' parameters used in the following experiments.
+and discuss the algorithms' parameters used in the following experiments.
 
 All processing, including manipulating with problem instances, solving constraint programming models,
 and conducting experiments, all described in the following sections, was done in Python using a library
 developed specifically for the purposes of this thesis.
-More about the library and running the experiments can be found in \cref{sec:attachments/documentation}.
+More about this library and running the experiments can be found in \cref{sec:attachments/documentation}.
 
 % -----------------------------------------------------------------------------------------------------------
 \subsection{Problem instances} \label{subsec:numerical-experiments/setup/instances}
@@ -35,7 +43,7 @@ For each setting, 10 random seeds were used to create a 10-instance batch.
 
 To accurately model our studied problem, we introduce several modifications to the original instances.
 Namely, we split the precedence graph to create individual order components,
-introduce job deadlines, and introduce time-variable resource capacities.
+introduce job due dates, and introduce time-variable resource capacities.
 Additionally, to ensure feasibility when modeling specific production systems,
 we scale down job durations and resource consumptions.
 Following are the modification steps in more details.
@@ -72,9 +80,9 @@ to denote that a resource is available each day during the specified working shi
 During those shifts, the resource capacity is set to its defined shift capacity $\shiftcapacity{k}$;
 outside those working shifts, the capacity is set to $0$.
 
-Third, we introduce job deadlines.
+Third, we introduce job due dates.
 As stated in \cref{sec:problem-statement/scheduling,sec:problem-statement/constraint-programming-model},
-it is sufficient to set deadlines for order jobs $j \in \Orders$ only.
+it is sufficient to set due dates for order jobs $j \in \Orders$ only.
 Those were set manually to simulate a continuous distribution of orders in time
 as they would appear in a real order-based manufacturing system.
 
@@ -82,7 +90,7 @@ Finally, if needed, the durations of jobs are scaled down appropriately.
 Previous modifications might have caused the problem instance to be infeasible
 --- a solution to the problem instance could no longer be found.
 Such infeasibility can be introduced by limiting resource availabilities to shifts
-where the shifts of two resources consumed by a job do not overlap
+where the shifts of two resources consumed by a job do not overlap,
 or overlap for a time duration smaller than the required execution duration of the job.
 In such cases, the durations of jobs are scaled down appropriately.
 Given that preemption is not allowed and job resource consumptions have to be concurrent,
@@ -102,64 +110,72 @@ and draw reasonable conclusions from those results.
 Each of our instance groups is based on 5 instances from some PSPLIB 10-instance batch,
 where every instance in the batch has similar resource and precedence properties,
 as mentioned earlier.
-The specific 5 instances were chosen based on similar precedence graphs
+The 5 specific instances were chosen based on similar precedence graphs
 that were formed by the precedence graph-splitting process described above.
 
 \begin{table}[p]
     \centering
-    \begin{tabularx}{0.95\textwidth}{lXcX}
+    \begin{tabularx}{\textwidth}{lXccX}
         \toprule
-        \textbf{Instances} & \textbf{Basefiles} & $|\Resources|$ & \textbf{Resource shifts} \\
+        \textbf{Instances} & \textbf{Basefiles} & $|\Jobs|$ & $|\Resources|$ & \textbf{Resource shifts} \\
         \midrule
         instance01* & j3011\_4.sm, j3011\_2.sm, j3011\_5.sm, j3011\_6.sm, j3011\_9.sm
+                    & 30
                     & 4 
                     & R1: M $|$ A $|$  \newline
                       R2: M $|$ A $|$  \newline
                       R3: M $|$ A $|$  \newline
                       R4: M $|$ A $|$
                     \\
-                    \cmidrule[0.01em](lr){1-4}
+                    \cmidrule[0.01em](lr){1-5}
         instance02* & j3010\_2.sm, j3010\_4.sm, j3010\_5.sm, j3010\_7.sm, j3010\_8.sm
+                    & 30
                     & 2 
                     & R1: M $|$ A $|$ N \newline
                       R2: M $|$ A $|$
                     \\
-                    \cmidrule[0.01em](lr){1-4}
+                    \cmidrule[0.01em](lr){1-5}
         instance03* & j6010\_7.sm, j6010\_8.sm, j6010\_9.sm, j6010\_6.sm, j6010\_2.sm 
+                    & 60
                     & 1 
                     & R1: M $|$ A $|$ 
                     \\
-                    \cmidrule[0.01em](lr){1-4}
+                    \cmidrule[0.01em](lr){1-5}
         instance04* & j6010\_7.sm, j6010\_8.sm, j6010\_9.sm, j6010\_6.sm, j6010\_2.sm
+                    & 60
                     & 1 
                     & R1: M $|$ A $|$
                     \\
-                    \cmidrule[0.01em](lr){1-4}
+                    \cmidrule[0.01em](lr){1-5}
         instance05* & j6011\_10.sm, j6011\_2.sm, j6011\_3.sm, j6011\_6.sm, j6011\_7.sm
+                    & 60
                     & 4 
                     & R1: M $|$ A $|$ \newline
                       R2: M $|$ A $|$ \newline
                       R3: \phantom{M} $|$ A $|$ N \newline
                       R4: M $|$ A $|$ N
                     \\
-                    \cmidrule[0.01em](lr){1-4}
+                    \cmidrule[0.01em](lr){1-5}
         instance06* & j6013\_6.sm, j6013\_2.sm, j6013\_3.sm, j6013\_5.sm, j6013\_10.sm
+                    & 60
                     & 4 
                     & R1: \phantom{M} $|$ A $|$ \newline
                       R2: \phantom{M} $|$ A $|$ \newline
                       R3: \phantom{M} $|$ A $|$ \newline
                       R4: \phantom{M} $|$ A $|$
                     \\
-                    \cmidrule[0.01em](lr){1-4}
+                    \cmidrule[0.01em](lr){1-5}
         instance07* & j1201\_1.sm, j1201\_3.sm, j1201\_6.sm, j1201\_7.sm, j1201\_10.sm
+                    & 120
                     & 4 
                     & R1: M $|$ A $|$ \newline
                       R2: M $|$ A $|$ \newline
                       R3: M $|$ A $|$ \newline
                       R4: M $|$ A $|$
                     \\
-                    \cmidrule[0.01em](lr){1-4}
+                    \cmidrule[0.01em](lr){1-5}
         instance08* & j1205\_1.sm, j1205\_5.sm, j1205\_6.sm, j1205\_7.sm, j1205\_9.sm
+                    & 120
                     & 2 
                     & R1: M $|$ A $|$ \newline
                       R2: M $|$ A $|$
@@ -171,8 +187,8 @@ that were formed by the precedence graph-splitting process described above.
         For each instance group,
         the "Basefiles" column contains names of the PSPLIB instances
         used to create the five instances from the group.
-        Following are columns describing the resource characteristics of the instance group ---
-        the number of resources and the resource availability profiles.
+        Following are columns describing the instance properties of the instance group ---
+        the number of jobs, the number of resources, and the resource availability profiles.
         The resource availability profiles consist of three possible shifts ---
         morning~(M), afternoon~(A), and night~(N) ---
         representing that the resource is available each day (period of 24 time periods)
@@ -207,7 +223,7 @@ they need to be reasonably fast
 We use solver warm-starting to speed up consecutive solution finding of modified problem instances.
 Models of modified instances usually differ only slightly from the models of the original problem instance.
 This means, that an (optimal) solution to the original problem instance
-might remain a feasible (if not directly an optimal) solution to a modified version of the problem instance.
+might remain a feasible (if not directly an optimal) solution to the modified version of the problem instance.
 If not, it is still probable that the desired feasible solution to the modified problem instance
 does not differ much from the initial solution to the original problem instance.
 
@@ -655,8 +671,9 @@ but the performance of the \ac{iira} on instance \inst{4}{2} is notably worse.
     ]{tables/data_kpis.tsv}
     \caption{
         Results concerning the induced schedule difference.
-        For each algorithm, the~first column represents the average schedule difference found for the instance,
-        the~second column represents the average difference in start times per job in the instance.
+        For each algorithm, the first column represents the average schedule difference found for the instance,
+        the second column represents the average difference in start times per job in the instance,
+        the third column represents the average schedule difference per unit of tardiness improvement.
         Instances for which no algorithm found any improvements were omitted.
         }
     \label{tab:exp/kpis-difference}

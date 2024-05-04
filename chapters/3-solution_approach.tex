@@ -482,8 +482,6 @@ and thus prevent the job $j$ from being scheduled there.
         The red vertical line represents the time period for which the suffix-relaxed schedule was computed.
         The resource capacity constraints were relaxed for jobs 5, 6, and 9
         as they were scheduled later than the specified time period.
-        In the suffix-relaxed schedule,
-        the start times of those jobs are constrained only by precedence constraints.
         We observe that in the relaxed schedule,
         job 9 would require only small capacity additions on both resources,
         should it be scheduled on them.
@@ -503,7 +501,8 @@ and thus prevent the job $j$ from being scheduled there.
         Job 9 is trivially included by \cref{def:closure/base}.
         Job 8 is included by \cref{def:closure/shift-pause-precedence} --- pauses in resource working shifts.
         Job 2 is included by \cref{def:closure/resource-precedence} --- resource predecessor of the job 8 on resource 2.
-        Conversely, job 3 ends the same time period job 2 start --- however, they are not linked with a precedence constraint.
+        Conversely, job 3 ends at the same time period job 2 starts, however, they are not precedence predecessors
+        and thus job 3 is not included.
         }
     \label{fig:schedule-closure}
 \end{figure}
@@ -610,14 +609,14 @@ formulated in \cref{alg:find-intervals-to-relax}.
         Computed example of a schedule with reduced resource capacity functions obtained by the \ac{ssira}
         ($\algMaxiter = 1, \algMaxintervals = 1, \algSortkey = \algSortkeyTime$).
         The capacity of resource 2 is reduced,
-        removing unused capacities introduced in \cref{fig:example/ssira-step}
-        The only additional capacity left is exactly the highlighted capacity consumed by the job 9.
+        removing unused capacities introduced in \cref{fig:example/ssira-step}.
+        The only additional capacity left is the highlighted capacity consumed by the job 9 migrated from resource 1.
         Note that this schedule is identical to the schedule obtained by the \ac{iira} in \cref{fig:example/iira-reduced}.
     }
     \label{fig:example/ssira-reduced}
 \end{figure}
 
-The algorithm consists of a main loop (lines~\ref{alg:ssira/repeat}--\ref{alg:ssira/for-iters}),
+The \ac{ssira} consists of a main loop (lines~\ref{alg:ssira/repeat}--\ref{alg:ssira/for-iters}),
 the input of which is a problem instance and its solution,
 the output of which is a modified problem instance and its solution.
 In each iteration of the main loop, the algorithm first finds improvement intervals (line~\ref{alg:ssira/ints}).
@@ -629,8 +628,8 @@ the modified resource capacity functions are reduced based on that solution,
 and capacity migrations and additions are computed in the reduced capacity functions.
 An example of a schedule obtained in the modified instance is given in \cref{fig:example/ssira-step}
 and that schedule with reduced capacity functions is given in \cref{fig:example/ssira-reduced}.
-Note that in this example, both the \ac{ssira} and the \ac{iira} obtained the same solution,
-given in \cref{fig:example/ssira-reduced} and \cref{fig:example/iira-reduced} respectively.
+Note that in this example, both the \ac{iira} and the \ac{ssira} obtained the same solution,
+given in \cref{fig:example/iira-reduced} and \cref{fig:example/ssira-reduced} respectively.
 
 The \algnameref{FindIntervalsToRelax}{alg:find-intervals-to-relax} function consists of initializations,
 the search for improvement intervals, and a preference-selection of intervals.
@@ -661,7 +660,7 @@ We describe the individual steps performed in the function in the following outl
         for the subsequent selection of preferred improvement intervals.
 
     \item
-        Predefined number of improvement intervals are selected based on a specified sort key
+        Predefined number of improvement intervals is selected based on a specified sort key
         (line~\ref{alg:ssira/ints/select-imp-ints}).
         The potential improvement intervals are ordered according to the sort key,
         and the first intervals from this ordering are selected as the proposed improvement intervals.
@@ -689,7 +688,7 @@ Complete pseudocodes of the functions are available in \cref{sec:attachments/alg
     \item \algnameref{ComputeSuffixRelaxedSchedule}{alg:suffix-relaxed-schedule}
         computes the suffix-relaxed schedule for a specified time period,
         as defined in \cref{def:suffix-relaxed-schedule}.
-        Initially, the topological order of the jobs in the instance is determined.
+        Initially, the topological order of the jobs in the instance is computed.
         Then, for each job considered in the topological order,
         its start time in the suffix-relaxed schedule is determined:
         if the job was scheduled up to the specified time period,
