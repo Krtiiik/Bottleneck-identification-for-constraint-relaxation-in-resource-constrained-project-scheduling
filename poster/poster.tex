@@ -1,16 +1,10 @@
-\documentclass[
-portrait,
-% landscape,
-a0paper%,
-%draft
-]
-{baposter}
-%
-% load packages
-% already loaded some useful packages for figures, tables and layout
-% not all are needed to run this minimal example
+% NEEDS TO BE COMPILED WITH pdflatex
+
+\documentclass[portrait,a0paper]{baposter}
+
 \usepackage{graphicx}
 \usepackage[percent]{overpic}
+\usepackage[utf8]{inputenc}
 \usepackage[detect-weight]{siunitx}
 \usepackage{tabto}
 \usepackage{booktabs}
@@ -22,104 +16,122 @@ a0paper%,
 \usepackage{ragged2e}
 \usepackage{qrcode}
 \usepackage{acro}
-% add additional packages you need here
-%
-% for now usig bibitem, but if you want ...
-%\usepackage[backend=biber]{biblatex} 
-%
-% customizing 
-\newlength{\mytextsize}
-\newcommand\e{\cdot 10^}
-\setlength{\unitlength}{1.0cm}
-%
-% define cern blue  
-% \definecolor{maincolor}{RGB}{80,110,185}
-\definecolor{maincolor}{RGB}{60,80,135}
-% \definecolor{maincolor}{RGB}{210,50,70}
-% \definecolor{maincolor}{RGB}{163,107,115}
-% \definecolor{maincolor}{RGB}{175,93,50}
-% \definecolor{maincolor}{RGB}{125,200,200}
-% \definecolor{headercolor}{RGB}{0,0,0}
-\definecolor{headercolor}{RGB}{255,255,255}
-\def\highlightcolorOne{blue!60!cyan!03}
-\def\highlightcolorTwo{blue!60!cyan!15}
-\definecolor{highlightcolor}{RGB}{70,150,255}
-% fonts
-\usepackage[scaled]{helvet}
-% \renewcommand*\familydefault{\sfdefault}
-%
-%
+\usepackage{textcomp}
 
-\input{macros}
-\input{abbreviations}
+\newlength{\mytextsize}
+\setlength{\unitlength}{1.0cm}
+
+%###########################################################################################################################
+% Customize here ############################################################################################################
+
+\def\posterTitle{%
+    Bottleneck identification for constraint relaxation\\
+    in resource-constrained project scheduling
+}
+\def\posterAuthor{%
+    Lukáš Nedbálek
+}
+\def\posterSchool{%
+    Faculty of Mathematics and Physics, Charles University
+}
+\def\posterYear{%
+    2024
+}
+\def\posterLogoFaculty{logos/mff-white.pdf}
+\def\posterLogoSchool{logos/uk-white.pdf}
+
+\definecolor{maincolor}{RGB}{60,80,135}
+\definecolor{headercolor}{RGB}{255,255,255}
+\definecolor{textbackgroundcolor}{RGB}{255,255,255}
+\definecolor{highlightcolor}{RGB}{70,150,255}
+\colorlet{highlightbackgroundcolorOne}{blue!60!cyan!03}
+\colorlet{highlightbackgroundcolorTwo}{blue!60!cyan!15}
+\def\backgroundcolor{gray!25}
+
+\usepackage[scaled]{helvet}
+% Uncomment for non-serif text font
+% \renewcommand*\familydefault{\sfdefault}
+
+%###########################################################################################################################
+% My own macros and commands ###############################################################################################
+
+% Custom red markings for TODO items
 \newcommand{\todo}[1]{%
     \textcolor{red}{\textbf{#1}}% Bold and red text
     \PackageWarning{TODO}{#1}% Warning in LaTeX log
 }
 % Custom headerbox command to left-align text
-\newcommand{\leftalignedheaderbox}[3]{%
-  \headerbox{#1}{#2}{%
-  % \RaggedRight{%
-  #3
-% }
+\newcommand{\leftalignedheaderbox}[3]{\headerbox{#1}{#2}{%
+    % Uncomment for left-aligned text
+    % \RaggedRight{%
+    #3
+    % }
 }}
-\newcommand{\highlight}[1]{%
-\textbf{\color{highlightcolor}#1}%
-}
+\newcommand{\highlightheaderbox}[3]{\leftalignedheaderbox{#1}{#2,%
+boxColorOne=highlightbackgroundcolorOne,boxColorTwo=highlightbackgroundcolorTwo%
+}{#3}}
+\newcommand{\footerbox}[2]{\headerbox{}{#1,%
+above=bottom,borderColor=maincolor,boxheaderheight=1pt%
+}{#2}}
+\newcommand{\highlight}[1]{\textbf{\color{highlightcolor}#1}}
+\newcommand{\indicator}[2]{\operatorname{#1}_{#2}}
+\newcommand{\indMRUR}[1]{\indicator{MRUR}{#1}}
+\newcommand{\indAUAU}[1]{\indicator{AUAU}{#1}}
 
-%##################################################################################
+\input{abbreviations}
+
+%###########################################################################################################################
 \begin{document}
-%##################################################################################
 \begin{poster}
 {
-  % options
-  grid=false,%true,
-  background=plain,
-  bgColorOne=gray!25,
-  columns=6, % for flexibility changing 2/3 columns with columnspan
-  eyecatcher=false,
-  borderColor=maincolor,
-  headerColorOne=maincolor, %white,
-  headershade=plain,
-  headerColorTwo=white,
-  headerborder=open,
-  % for rectangular boxes change the next two options, rectangular header will cause left aligning of box title 
-  textborder=rectangle, %rectangle,
-  headershape=rectangle, %rectangle,
-  headerfont=\bf\Large\sffamily,
-  boxshade=shadetb,
-  boxColorOne=white,
-  boxColorTwo=white,
-  headerFontColor=headercolor,
-  boxpadding=1em
-}
-{
-  %eyecatcher ...
-}
-{
-  %poster title
-  % first put graphics for header
-  \hspace*{-0.5mm}
-  \begin{picture}(23.7, 3)
-  \fboxsep0pt
-  \put(-0.196, -0.6){\colorbox{maincolor}{\rule[96pt]{675.82pt}{0pt}}}
-  \thicklines
-  % minipage box for title and authors
-  \put(2.55, 2.35){
-    \begin{minipage}[t][96pt]{0.75\textwidth}
-    % centering
-    \begin{center}
-    \huge\bf\color{white}\sffamily Bottleneck identification for constraint relaxation \\ 
-    \huge\bf\sffamily in resource-constrained project scheduling \vspace{0.15cm} \\ 
-    \vspace{0.2cm}
-    % \large Lukáš Nedbálek \\[0.3em]
-    % \small Faculty of Mathematics and Physics, Charles University \\
-    \large Lukáš Nedbálek \raisebox{0.1em}{$\bigm\lvert$} Faculty of Mathematics and Physics, Charles University \raisebox{0.1em}{$\bigm\lvert$} 2024 \\
-    \end{center} 
-  \end{minipage}}
-  \put(20.52,-0.24){\includegraphics[height=75pt]{logos/uk-white.pdf}}
-  \put(0.24,-0.24){\includegraphics[height=75pt]{logos/mff-white.pdf}}
-  \end{picture} 
+    grid=false,
+    eyecatcher=false, % Custom main header
+    columns=6, % for flexibility -- changing 2/3 columns with columnspan
+    %
+    background=plain,
+    bgColorOne=\backgroundcolor,
+    %
+    headerfont=\bf\Large\sffamily,
+    headerFontColor=headercolor,
+    headershape=rectangle, %rectangle,
+    headershade=plain,
+    headerColorOne=maincolor,
+    headerborder=open,
+    %
+    boxshade=shadetb,
+    boxColorOne=textbackgroundcolor,
+    boxColorTwo=textbackgroundcolor,
+    textborder=rectangle, %rectangle,
+    borderColor=maincolor,
+    boxpadding=1em
+}{}{
+    % poster title
+    \hspace*{-0.5mm}
+    \begin{picture}(23.7, 3)
+    \fboxsep0pt
+    \put(-0.196, -0.6){\colorbox{maincolor}{\rule[96pt]{675.82pt}{0pt}}}
+    \thicklines
+    % minipage box for title and authors
+    % Faculty logo
+    \put(0.24,-0.24){\includegraphics[height=75pt]{\posterLogoFaculty}}
+    \put(2.55, 2.35){
+        \begin{minipage}[t][96pt]{0.75\textwidth}
+        \begin{center}
+        {\huge\bf\color{headercolor}\sffamily%
+            \posterTitle \\[0.35cm]
+        }
+        {\large\color{headercolor}\sffamily%
+            \posterAuthor
+            \raisebox{0.1em}{$\bigm\lvert$}
+            \posterSchool
+            \raisebox{0.1em}{$\bigm\lvert$}
+            \posterYear
+            \\
+        }
+        \end{center} 
+        \end{minipage}}
+    \put(20.52,-0.24){\includegraphics[height=75pt]{\posterLogoSchool}}
+    \end{picture} 
 }{}{}
 % ==========================================================================================================================
 % ==========================================================================================================================
@@ -139,7 +151,7 @@ a0paper%,
     \hfill
     \begin{minipage}{0.4\textwidth}
         \begin{center}
-            \includegraphics[width=\linewidth]{img/Schedule.pdf}
+            \includegraphics[width=\linewidth]{../img/Schedule.pdf}
             Example of extended RCPSP schedule
         \end{center}
     \end{minipage}
@@ -160,11 +172,8 @@ bottomaligned=problemStatement
     \end{itemize}
 }
 % ==========================================================================================================================
-\leftalignedheaderbox{Identification Indicator-based Relaxing Algorithm}{%
-name=iira,span=3,column=0,below=problemStatement,
-% boxColorTwo=red!45!yellow!30
-boxColorOne=\highlightcolorOne,
-boxColorTwo=\highlightcolorTwo
+\highlightheaderbox{Identification Indicator-based Relaxing Algorithm}{%
+name=iira,column=0,span=3,below=problemStatement%
 }{
     We propose two \emph{bottleneck identification indicators} for the extended \acs{rcpsp}
     --- \acf{mrur} and \acf{auau}. Each computes a single numeric value for a given resource $k$.
@@ -194,11 +203,8 @@ boxColorTwo=\highlightcolorTwo
     on remaining resources.
 }
 % --------------------------------------------------------------------------------------------------------------------------
-\leftalignedheaderbox{Schedule Suffix Interval Relaxing Algorithm}{%
-name=ssira,span=3,column=3,below=problemStatement,
-% boxColorTwo=red!45!yellow!30
-boxColorOne=\highlightcolorOne,
-boxColorTwo=\highlightcolorTwo
+\highlightheaderbox{Schedule Suffix Interval Relaxing Algorithm}{%
+name=ssira,column=3,span=3,below=problemStatement%
 }{
     The \acf{ssira} relaxes \emph{suffixes of schedules} to obtain heuristic interval relaxation proposals.
     The algorithm focuses on the target manufacturing order
@@ -212,7 +218,9 @@ boxColorTwo=\highlightcolorTwo
     Same as in the \acs{iira}, the capacity changes are reduced and corresponding capacity \emph{migrations} and \emph{additions} are identified.
 }
 % ==========================================================================================================================
-\leftalignedheaderbox{Experiments}{name=experiments, below=iira, span=3, row=0, column=0}{
+\leftalignedheaderbox{Experiments}{%
+name=experiments,column=0,row=0,span=3,below=iira%
+}{
     Numerical experiments we conducted to analyze the capabilities
     of the proposed methods. For that purpose, we designed a set of problem instances
     (based on PSPLIB instances) modeling the used extension of the RCPSP.
@@ -222,7 +230,9 @@ boxColorTwo=\highlightcolorTwo
     where the SSIRA finds the same improvements with greater costs.
 }		
 % --------------------------------------------------------------------------------------------------------------------------
-\leftalignedheaderbox{Summary}{name=summary, span=3, below=ssira, column=3, bottomaligned=experiments}{
+\leftalignedheaderbox{Summary}{%
+name=summary,column=3,span=3,below=ssira,bottomaligned=experiments%
+}{
     In this thesis, we
     \begin{itemize}[leftmargin=*]
         \item
@@ -240,7 +250,9 @@ boxColorTwo=\highlightcolorTwo
     capturing all model dependencies.
 }
 % Footer ===================================================================================================================
-\headerbox{}{headershape=rectangle, name=repository, column=2, span=4, above=bottom, borderColor=maincolor,  boxheaderheight=1pt}{
+\footerbox{%
+name=repository,column=2,span=4%
+}{
     \begin{minipage}{.17\textwidth}
         \begin{center}
             % \vspace{-0.22cm}%
@@ -264,7 +276,9 @@ boxColorTwo=\highlightcolorTwo
         \end{center}
     \end{minipage}%
 }
-\headerbox{}{headershape=rectangle, name=supervisor, column=0, span=2, above=bottom, borderColor=maincolor,  boxheaderheight=1pt, aligned=repository}{
+\footerbox{%
+name=supervisor,column=0,span=2,aligned=repository%
+}{
     \textbf{\sffamily\large\color{maincolor}Supervisor}
     \\[0.4em]
     {\large RNDr. Jiří Švancara, Ph.D.}
