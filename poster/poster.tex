@@ -135,7 +135,9 @@ above=bottom,borderColor=maincolor,boxheaderheight=1pt%
 }{}{}
 % ==========================================================================================================================
 % ==========================================================================================================================
-\leftalignedheaderbox{Problem statement}{name=problemStatement, column=0, row=0, span=4}{
+\leftalignedheaderbox{Problem statement}{%
+name=problemStatement,column=0,row=0,span=4%
+}{
     \begin{minipage}[0.4\textwidth]{0.56\textwidth}
         % \vspace{-0.85em}
         Scheduling large manufacturing systems is a difficult task.
@@ -157,8 +159,8 @@ above=bottom,borderColor=maincolor,boxheaderheight=1pt%
     \end{minipage}
 }
 % --------------------------------------------------------------------------------------------------------------------------
-\leftalignedheaderbox{Goals}{name=goals, span=2, column=4, row=0,%
-bottomaligned=problemStatement
+\leftalignedheaderbox{Goals}{
+name=goals,column=4,row=0,span=2,bottomaligned=problemStatement%
 }{
     \begin{itemize}[leftmargin=*]
         \item 
