@@ -7,8 +7,7 @@ In modern manufacturing systems, \ac{aps} software is used to schedule productio
 manage resources, and analyze complex production data.
 This software helps manufacturing planners to schedule production plans
 and make important decisions regarding the manufacturing systems.
-Modeling and solving such tasks is very difficult, especially in larger manufacturing systems.
-The production needs to meet demand while performing optimally with respect to multiple,
+Production needs to meet demand while performing optimally with respect to multiple,
 often competing, optimization goals.
 For humans --- even knowledgeable professionals ---
 the set of constraints and conflicting priorities becomes too complex to gain full insight
@@ -22,22 +21,22 @@ This leads to users of the \ac{aps} software to plan production by iteratively
 scheduling and fine-tuning settings to obtain an acceptable schedule.
 
 In this thesis, we address a problem which arises frequently in manufacturing ---
-the problem of reducing the tardiness of a selected order in an existing production schedule.
+the problem of reducing the tardiness of a selected manufacturing order in an existing production schedule.
 Upon obtaining a schedule constructed to meet all the extensive production demands,
-we observe that a particular order is overly tardy with respect to its deadline.
-We would like to obtain a modified schedule which reduces the tardiness of that order
+we observe that a particular manufacturing order is overly tardy with respect to its deadline.
+We would like to obtain a modified schedule which reduces the tardiness of that manufacturing order
 while not differing from the original schedule much.
 This corresponds to a scenario where, for example, after a discussion with the intended customer,
-we need to prioritize the production of the order considered.
+we need to prioritize the production of the manufacturing order considered.
 However, production has already been scheduled and re-planning it entirely is not acceptable.
 Our goal is to find modifications to the schedule,
 potentially locally adjusting the settings of the system,
-to decrease the tardiness of the target order with minimal impact on the remaining production.
+to decrease the tardiness of the target manufacturing order with minimal impact on the remaining production.
 
 We achieve this by considering manufacturing bottlenecks in the schedule,
 related to specific manufacturing constraints.
 Our aim is to identify these limiting constraints
-and relax them to improve the tardiness of a selected order.
+and relax them to improve the tardiness of a selected manufacturing order.
 Following the relaxation, we obtain a modified schedule and compare the improvements.
 An example of such a modification is illustrated in \cref{fig:schedule-change}.
 
@@ -48,7 +47,7 @@ The first method adapts existing approaches from the literature,
 which, however, address the problem in simplified scheduling models.
 We first need to adapt the approaches to our problem.
 The seconds method is developed specifically to address the problem.
-This method utilizes relaxations which focus specifically on the target order.
+This method utilizes relaxations which focus specifically on the target manufacturing order.
 Lastly, we present a set of problem instances designed to model the addressed scheduling problem
 and we evaluate the two methods using the presented problem instance set.
 

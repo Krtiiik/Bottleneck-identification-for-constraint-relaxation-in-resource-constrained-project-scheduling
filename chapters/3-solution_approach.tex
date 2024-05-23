@@ -30,12 +30,20 @@ key moments on the schedule given in \cref{fig:example/base}.
 In the illustrated schedule, job 9 is scheduled past its due date and is considered tardy.
 This job is the target order for improvements in the examples provided for the algorithms.
 
-\begin{figure}
+\begin{figure}[t]
     \centering
     \includegraphics[width=\textwidth]{img/example_solution_base.pdf}
     \caption{
         Computed example schedule.
         Job 9 is considered tardy as it is scheduled past its due date (time period 22).
+        The figure consists of three panels: scheduled job intervals panel
+        and two resource panels, each corresponding to a specific resource in the project.
+        All panels share a common x-axis denoting time in time periods.
+        The job interval panel illustrates the arrangement of jobs in the schedule,
+        where their y-positions were chosen arbitrarily.
+        In each resource panel, the availability of the corresponding resource
+        is illustrated by a gray step function
+        and the consuming load is illustrated by a green step function.
         }
     \label{fig:example/base}
 \end{figure}

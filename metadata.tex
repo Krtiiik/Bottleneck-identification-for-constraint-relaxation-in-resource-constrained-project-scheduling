@@ -58,24 +58,23 @@ In modern manufacturing systems, production planners create schedules
 by iteratively obtaining proposed schedules and adjusting input parameters
 to satisfy multiple, often competing, optimization goals.
 The goal of this thesis is to address the problem
-of reducing the tardiness of a particular order in an obtained schedule,
+of reducing the tardiness of a particular manufacturing order in an obtained schedule,
 which is a practical problem commonly arising in production scheduling.
 We do this by identifying bottlenecks in the schedule
 and proposing relaxations to constraints related to the identified bottlenecks.
-We develop two methods for this purpose.
-The first method adapts existing approaches from the scheduling literature and proposes general relaxations.
+We develop two methods for this purpose, both utilizing constraint programming.
+The first baseline method adapts existing approaches from the literature and proposes general relaxations.
 The second method identifies potential improvements in relaxed versions of the problem
-and proposes relaxations targeting the specific order.
-To evaluate the performance of the methods,
-we present a set of problem instances modeling the addressed problem
-and conduct numerical experiments.
+and proposes relaxations targeting the specific manufacturing order.
+Numerical experiments show that the baseline method achieves great improvements for small costs,
+while the second method is more reliable in achieving improvements across various problem instances.
 }
 
 % 3 to 5 keywords (recommended) separated by \sep
 % Keywords are useful for indexing and searching for the theses by topic.
 \def\ThesisKeywords{%
 scheduling\sep%
-resource-constrained scheduling\sep%
+RCPSP\sep%
 bottlenecks\sep%
 constraint relaxation
 }
@@ -92,6 +91,7 @@ constraint relaxation
 % fonts a bit smaller by this setting. (Also, you should try to compress your abstract more.)
 % \def\InfoPageFont{}
 \def\InfoPageFont{\small}  % uncomment to decrease font size
+% \def\InfoPageFont{\footnotesize}  % uncomment to decrease font size
 
 % If you are studing in a Czech programme, you also need to provide metadata in Czech:
 % (in English programmes, this is not used anywhere)
@@ -104,23 +104,22 @@ constraint relaxation
 
 \def\ThesisKeywordsCS{%
 plánování výroby\sep%
-plánování výroby s omezenými zdroji\sep%
+RCPSP\sep%
 úzká hrdla\sep%
 relaxování omezujících podmínek
 }
 
 \def\AbstractCS{%
-Plánovači výroby často sestavují rozvrh výroby pomocí plánovacích nástrojů.
-Iterovavaným získáváním návrhů na rozvrh a úpravami vstupních parametrů
-se snaží vyhovět mnohým, často protichůdným, optimalizačním cílům.
+Plánovači výroby často sestavují rozvrh výroby tak, že iterovavaně získávájí návrhy na rozvrh
+a upravují vstupní parametry za účelem vyhovět mnohým, často protichůdným, optimalizačním cílům.
 Cílem této práce je zaměřit se na problém snižování zpoždění, tzv. tardiness, vybrané zakázky v obdrženém rozvrhu,
 jakožto běžně řešený problém při plánování výroby.
 Zaměříme se na identifikaci tzv. úzkých hrdel daných rozvrhů
-za účelem relaxace omezujících podmínek souvisejících s identifikovanými úzkými hrdly.
+za účelem relaxace omezujících podmínek souvisejících s těmito úzkými hrdly.
 Pro tento účel představíme dvě metody.
-První metoda adaptuje existující přístupy z literatury v kombinaci s návrhy obecných relaxací podmínek.
-Druhá metoda identifikuje potenciální zlepšení v relaxovaných verzích problému
+První adaptuje existující přístupy z literatury v kombinaci s návrhy obecných relaxací podmínek.
+Druhá identifikuje potenciální zlepšení v relaxovaných verzích problému
 a navrhuje relaxace zaměřující se na konkrétní zpožděnou zakázku.
-Pro zhodnocení výkonu představených metod vytvoříme sadu instancí modelujících daný problém
-a provedeme numerické experimenty.
+Numerické experimenty ukazují, že zatímco první metoda nachází dobrá zlepšující řešení za nízké ceny,
+druhá metoda je v nacházení zlepšujících řešení více konzistentní.
 }

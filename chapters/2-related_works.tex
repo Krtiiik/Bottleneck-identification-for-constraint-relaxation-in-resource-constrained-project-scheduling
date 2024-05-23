@@ -247,10 +247,8 @@ i.e. the jobs which are executed on the resource $k$.
 
 Identification indicators have the advantage of being simple,
 making their implementation straightforward and their computation efficient.
-However, more complex identification methods may provide better insights
-into the bottleneck identification process.
-Nevertheless, these methods are usually tailored specifically to the problem being studied,
-require specific settings and assumptions,
+More complex identification methods may provide better insight into the bottleneck identification process,
+however, such methods are usually tailored specifically to a specific version of the problem
 or their implementation can be too complicated for practical use.
 
 % -----------------------------------------------------------------------------------------------------------
@@ -264,8 +262,7 @@ i.e. scheduling on unit-capacity resources.
 process of a genetic algorithm.
 \citet{Arkhipov2017} conducted a case study on a large-scale resource-constrained scheduling problem
 with over 3 thousand operations and over 50 machines.
-To address this problem, they proposed a heuristic approach for estimating project makespan
-and resource load profiles.
+They proposed a heuristic approach for estimating project makespan and resource load profiles.
 Those estimations are in turn used to identify bottleneck resources for the problem.
 However, the identified bottleneck resources were not addressed further.
 
@@ -300,15 +297,12 @@ wherein the capacity of the identified bottleneck resource is increased,
 e.g., by extending its working shifts, or assigning additional employees.
 Then, the bottleneck identification process is run again to examine
 whether the bottlenecks shift to a different resource.
-The sensitivity of bottleneck shifting to the introduced relaxations was also studied.
 The authors observed that while the chasing policy is effective at relaxing local bottlenecks,
 it also increases the \enquote{bottleneck shiftiness,}
 resulting in a more change-sensitive system.
 They also studied the shiftiness of long-run bottleneck resources having the highest utilization over time.
-Their results showed that increasing the capacity of bottleneck resources
-to address long-run bottlenecks also increases the bottleneck shiftiness,
-but this shiftiness can be reduced by simultaneously increasing the capacity of non-bottleneck
-resources.
+Results show that increasing the capacity of long-run bottleneck resources also increases the bottleneck shiftiness,
+but this shiftiness can be reduced by simultaneously increasing the capacity of non-bottleneck resources.
 
 \section{Contribution} \label{sec:related-works/contribution}
 

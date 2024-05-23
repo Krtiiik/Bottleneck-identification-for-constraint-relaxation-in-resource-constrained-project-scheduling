@@ -90,8 +90,8 @@
 \ifcsname DeclareCaptionStyle\endcsname
 \DeclareCaptionStyle{thesis}{style=base,font=small,labelfont=bf,labelsep=quad}
 \captionsetup{style=thesis}
-% \captionsetup[algorithm]{style=thesis,singlelinecheck=off}
-% \captionsetup[listing]{style=thesis,singlelinecheck=off}
+\captionsetup[algorithm]{style=thesis,singlelinecheck=off}
+\captionsetup[listing]{style=thesis,singlelinecheck=off}
 \fi
 
 %%% An environment for typesetting of program code and input/output
@@ -109,6 +109,19 @@
   commentstyle=\color{green!50!black},
   stringstyle=\color{red!50!black},
   keywordstyle=\color{blue!75!black}}
+\fi
+
+\ifcsname lstset\endcsname
+\lstset{
+    language=Python,
+    basicstyle=\ttm,
+    morekeywords={self},              % Add keywords here
+    keywordstyle=\ttb\color{deepblue},
+    emph={MyClass,__init__},          % Custom highlighting
+    emphstyle=\ttb\color{deepred},    % Custom highlighting style
+    stringstyle=\color{deepgreen},
+    frame=tb,                         % Any extra options here
+    showstringspaces=false}
 \fi
 
 % Floating listings, used in the same way as the figure environment
