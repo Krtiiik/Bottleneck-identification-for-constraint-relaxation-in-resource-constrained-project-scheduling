@@ -44,9 +44,12 @@
 \definecolor{headercolor}{RGB}{255,255,255}
 \definecolor{textbackgroundcolor}{RGB}{255,255,255}
 \definecolor{highlightcolor}{RGB}{70,150,255}
-\colorlet{highlightbackgroundcolorOne}{blue!60!cyan!03}
-\colorlet{highlightbackgroundcolorTwo}{blue!60!cyan!15}
+\colorlet{highlightbackgroundcolorOne}{blue!60!cyan!10}
+\colorlet{highlightbackgroundcolorTwo}{blue!60!cyan!10}
 \def\backgroundcolor{gray!25}
+
+% \def\headerfont{\bf\Large\sffamily}
+\def\headerfont{\bf\sffamily\fontsize{13.5}{8}\selectfont}
 
 \usepackage[scaled]{helvet}
 % Uncomment for non-serif text font
@@ -61,7 +64,7 @@
     \PackageWarning{TODO}{#1}% Warning in LaTeX log
 }
 % Custom headerbox command to left-align text
-\newcommand{\leftalignedheaderbox}[3]{\headerbox{#1}{#2}{%
+\newcommand{\leftalignedheaderbox}[3]{\headerbox{\hspace{0.1em}#1}{#2}{%
     % Uncomment for left-aligned text
     % \RaggedRight{%
     #3
@@ -70,9 +73,11 @@
 \newcommand{\highlightheaderbox}[3]{\leftalignedheaderbox{#1}{#2,%
 boxColorOne=highlightbackgroundcolorOne,boxColorTwo=highlightbackgroundcolorTwo%
 }{#3}}
-\newcommand{\footerbox}[2]{\headerbox{}{#1,%
-above=bottom,borderColor=maincolor,boxheaderheight=1pt%
+\newcommand{\footerbox}[2]{\headerbox{}{%
+#1,%
+headershape=rectangle,above=bottom,borderColor=maincolor, boxheaderheight=1pt%
 }{#2}}
+
 \newcommand{\highlight}[1]{\textbf{\color{highlightcolor}#1}}
 \newcommand{\indicator}[2]{\operatorname{#1}_{#2}}
 \newcommand{\indMRUR}[1]{\indicator{MRUR}{#1}}
@@ -91,7 +96,7 @@ above=bottom,borderColor=maincolor,boxheaderheight=1pt%
     background=plain,
     bgColorOne=\backgroundcolor,
     %
-    headerfont=\bf\Large\sffamily,
+    headerfont={\headerfont},
     headerFontColor=headercolor,
     headershape=rectangle, %rectangle,
     headershade=plain,
@@ -135,9 +140,7 @@ above=bottom,borderColor=maincolor,boxheaderheight=1pt%
 }{}{}
 % ==========================================================================================================================
 % ==========================================================================================================================
-\leftalignedheaderbox{Problem statement}{%
-name=problemStatement,column=0,row=0,span=4%
-}{
+\leftalignedheaderbox{1. Problem statement}{name=problemStatement, column=0, row=0, span=4}{
     \begin{minipage}[0.4\textwidth]{0.56\textwidth}
         % \vspace{-0.85em}
         Scheduling large manufacturing systems is a difficult task.
@@ -159,8 +162,8 @@ name=problemStatement,column=0,row=0,span=4%
     \end{minipage}
 }
 % --------------------------------------------------------------------------------------------------------------------------
-\leftalignedheaderbox{Goals}{
-name=goals,column=4,row=0,span=2,bottomaligned=problemStatement%
+\leftalignedheaderbox{2. Goals}{name=goals, span=2, column=4, row=0,%
+bottomaligned=problemStatement
 }{
     \begin{itemize}[leftmargin=*]
         \item 
@@ -174,7 +177,7 @@ name=goals,column=4,row=0,span=2,bottomaligned=problemStatement%
     \end{itemize}
 }
 % ==========================================================================================================================
-\highlightheaderbox{Identification Indicator-based Relaxing Algorithm}{%
+\highlightheaderbox{3. Identification Indicator-based Relaxing Algorithm}{%
 name=iira,column=0,span=3,below=problemStatement%
 }{
     We propose two \emph{bottleneck identification indicators} for the extended \acs{rcpsp}
@@ -205,7 +208,7 @@ name=iira,column=0,span=3,below=problemStatement%
     on remaining resources.
 }
 % --------------------------------------------------------------------------------------------------------------------------
-\highlightheaderbox{Schedule Suffix Interval Relaxing Algorithm}{%
+\highlightheaderbox{4. Schedule Suffix Interval Relaxing Algorithm}{%
 name=ssira,column=3,span=3,below=problemStatement%
 }{
     The \acf{ssira} relaxes \emph{suffixes of schedules} to obtain heuristic interval relaxation proposals.
@@ -220,10 +223,10 @@ name=ssira,column=3,span=3,below=problemStatement%
     Same as in the \acs{iira}, the capacity changes are reduced and corresponding capacity \emph{migrations} and \emph{additions} are identified.
 }
 % ==========================================================================================================================
-\leftalignedheaderbox{Experiments}{%
+\leftalignedheaderbox{5. Experiments}{%
 name=experiments,column=0,row=0,span=3,below=iira%
 }{
-    Numerical experiments we conducted to analyze the capabilities
+    Numerical experiments were conducted to analyze the capabilities
     of the proposed methods. For that purpose, we designed a set of problem instances
     (based on PSPLIB instances) modeling the used extension of the RCPSP.
 
@@ -232,7 +235,7 @@ name=experiments,column=0,row=0,span=3,below=iira%
     where the SSIRA finds the same improvements with greater costs.
 }		
 % --------------------------------------------------------------------------------------------------------------------------
-\leftalignedheaderbox{Summary}{%
+\leftalignedheaderbox{6. Summary}{%
 name=summary,column=3,span=3,below=ssira,bottomaligned=experiments%
 }{
     In this thesis, we
@@ -253,7 +256,7 @@ name=summary,column=3,span=3,below=ssira,bottomaligned=experiments%
 }
 % Footer ===================================================================================================================
 \footerbox{%
-name=repository,column=2,span=4%
+name=repository,column=2,span=4,above=bottom%
 }{
     \begin{minipage}{.17\textwidth}
         \begin{center}
@@ -279,7 +282,7 @@ name=repository,column=2,span=4%
     \end{minipage}%
 }
 \footerbox{%
-name=supervisor,column=0,span=2,aligned=repository%
+name=supervisor,column=0,span=2,above=bottom,aligned=repository%
 }{
     \textbf{\sffamily\large\color{maincolor}Supervisor}
     \\[0.4em]
