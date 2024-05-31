@@ -21,26 +21,26 @@
 % \let\openright=\clearpage
 
 %% Settings for two-sided (duplex) printing
-% \documentclass[12pt,a4paper,twoside,openright]{report}
-% \setlength\textwidth{145mm}
-% \setlength\textheight{247mm}
-% \setlength\oddsidemargin{14.2mm}
-% \setlength\evensidemargin{0mm}
-% \setlength\topmargin{0mm}
-% \setlength\headsep{0mm}
-% \setlength\headheight{0mm}
-% \let\openright=\cleardoublepage
-
-%% If the thesis has no printed version, symmetric margins look better
-\documentclass[12pt,a4paper]{report}
+\documentclass[12pt,a4paper,twoside,openright]{report}
 \setlength\textwidth{145mm}
 \setlength\textheight{247mm}
-\setlength\oddsidemargin{10mm}
-\setlength\evensidemargin{10mm}
+\setlength\oddsidemargin{14.2mm}
+\setlength\evensidemargin{0mm}
 \setlength\topmargin{0mm}
 \setlength\headsep{0mm}
 \setlength\headheight{0mm}
-\let\openright=\clearpage
+\let\openright=\cleardoublepage
+
+%% If the thesis has no printed version, symmetric margins look better
+% \documentclass[12pt,a4paper]{report}
+% \setlength\textwidth{145mm}
+% \setlength\textheight{247mm}
+% \setlength\oddsidemargin{10mm}
+% \setlength\evensidemargin{10mm}
+% \setlength\topmargin{0mm}
+% \setlength\headsep{0mm}
+% \setlength\headheight{0mm}
+% \let\openright=\clearpage
 
 %% Generate PDF/A-2u
 \usepackage[a-2u]{pdfx}
